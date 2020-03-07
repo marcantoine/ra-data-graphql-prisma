@@ -8,23 +8,20 @@ const sanitizeResource = (
   resource: Resource,
   fieldLookup?: Function
 ) => (data: { [key: string]: any }): any => {
-  console.log('data', data)
-  console.log('introspectionResults', introspectionResults)
-  console.log('resource', resource)
   return Object.keys(data).reduce((acc, key) => {
     if (key.startsWith('_')) {
       return acc;
     }
 
+    // TODO - Should check if a field is not found, to help debugging with explicit error message (DX)
     const field: IntrospectionField = (resource.type as IntrospectionObjectType).fields.find(
       field => {
-        console.log('f.name', field.name, key)
         return field.name === (fieldLookup ? fieldLookup(field, key, acc, introspectionResults) : key)
       }
     )!;
-      console.log('field', field)
-      console.log('type', field.type)
+    console.log('resolved field: ', field, 'for key:', key)
     const type = getFinalType(field.type);
+    console.log('type', type)
 
     if (type.kind !== TypeKind.OBJECT) {
       return { ...acc, [field.name]: data[field.name] };
