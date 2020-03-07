@@ -1,20 +1,29 @@
-import { TypeKind, IntrospectionObjectType } from 'graphql';
+import { TypeKind, IntrospectionObjectType, IntrospectionField } from 'graphql';
 import { GET_LIST, GET_MANY, GET_MANY_REFERENCE } from 'react-admin';
 import getFinalType from './utils/getFinalType';
 import { IntrospectionResult, Resource } from './constants/interfaces';
 
 const sanitizeResource = (
   introspectionResults: IntrospectionResult,
-  resource: Resource
+  resource: Resource,
+  fieldLookup?: Function
 ) => (data: { [key: string]: any }): any => {
+  console.log('data', data)
+  console.log('introspectionResults', introspectionResults)
+  console.log('resource', resource)
   return Object.keys(data).reduce((acc, key) => {
     if (key.startsWith('_')) {
       return acc;
     }
 
-    const field = (resource.type as IntrospectionObjectType).fields.find(
-      f => f.name === key
+    const field: IntrospectionField = (resource.type as IntrospectionObjectType).fields.find(
+      field => {
+        console.log('f.name', field.name, key)
+        return field.name === (fieldLookup ? fieldLookup(field, key, acc, introspectionResults) : key)
+      }
     )!;
+      console.log('field', field)
+      console.log('type', field.type)
     const type = getFinalType(field.type);
 
     if (type.kind !== TypeKind.OBJECT) {
@@ -58,11 +67,11 @@ const sanitizeResource = (
   }, {});
 };
 
-export default (introspectionResults: IntrospectionResult) => (
+export default (introspectionResults: IntrospectionResult, fieldLookup?: Function) => (
   aorFetchType: string,
   resource: Resource
 ) => (response: { [key: string]: any }) => {
-  const sanitize = sanitizeResource(introspectionResults, resource);
+  const sanitize = sanitizeResource(introspectionResults, resource, fieldLookup);
   const data = response.data;
 
   if (

@@ -1,11 +1,12 @@
 import buildVariables from './buildVariables';
-import buildGqlQuery from './buildGqlQuery';
+import buildGqlQuery, { Query } from './buildGqlQuery';
 import getResponseParser from './getResponseParser';
 import { IntrospectionResult } from './constants/interfaces';
 import { DocumentNode } from 'graphql';
 
 export const buildQueryFactory = () => (
-  introspectionResults: IntrospectionResult
+  introspectionResults: IntrospectionResult,
+  fieldLookup?: Function
 ) => {
   const knownResources = introspectionResults.resources.map(r => r.type.name);
 
@@ -26,7 +27,7 @@ export const buildQueryFactory = () => (
         )}`
       );
     }
-    const queryType = resource[aorFetchType];
+    const queryType: Query = resource[aorFetchType];
 
     if (!queryType) {
       throw new Error(
@@ -47,7 +48,7 @@ export const buildQueryFactory = () => (
       variables,
       fragment
     );
-    const parseResponse = getResponseParser(introspectionResults)(
+    const parseResponse = getResponseParser(introspectionResults, fieldLookup)(
       aorFetchType,
       resource
     );
