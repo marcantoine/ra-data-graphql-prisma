@@ -19,9 +19,7 @@ const sanitizeResource = (
         return field.name === (fieldLookup ? fieldLookup(field, key, acc, introspectionResults) : key)
       }
     )!;
-    console.log('resolved field: ', field, 'for key:', key)
     const type = getFinalType(field.type);
-    console.log('type', type)
 
     if (type.kind !== TypeKind.OBJECT) {
       return { ...acc, [field.name]: data[field.name] };
