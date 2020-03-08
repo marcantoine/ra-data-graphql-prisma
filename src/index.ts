@@ -45,6 +45,7 @@ const defaultOptions = {
 export default (options: {
   client?: ApolloClient<any>;
   clientOptions?: ApolloClientOptions<any>;
+  debug?: boolean;
 }) => {
   return buildDataProvider(merge({}, defaultOptions, options)).then(
     graphQLDataProvider => {
@@ -82,6 +83,11 @@ export default (options: {
           });
         }
         const res = await graphQLDataProvider(fetchType, resource, params);
+
+        if(options.debug){
+          console.log('results', res);
+        }
+
         return res
       };
     }
