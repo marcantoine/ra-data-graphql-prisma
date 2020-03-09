@@ -6,19 +6,39 @@ import { IntrospectionResult, Resource } from './constants/interfaces';
 const sanitizeResource = (
   introspectionResults: IntrospectionResult,
   resource: Resource,
-  fieldLookup?: Function
+  fieldAliasResolver?: Function,
 ) => (data: { [key: string]: any }): any => {
   return Object.keys(data).reduce((acc, key) => {
     if (key.startsWith('_')) {
       return acc;
     }
 
-    // TODO - Should check if a field is not found, to help debugging with explicit error message (DX)
-    const field: IntrospectionField = (resource.type as IntrospectionObjectType).fields.find(
+    let field: IntrospectionField | undefined = (resource.type as IntrospectionObjectType).fields.find(
       field => {
-        return field.name === (fieldLookup ? fieldLookup(field, key, acc, introspectionResults) : key)
+        return field.name === key; // Aliased fields won't be found through such simple comparison (ie: myTitle: title)
       }
-    )!;
+    );
+    if(typeof field === 'undefined' && fieldAliasResolver){
+      // The field wasn't resolved, it's likely an alias, try to resolve alias
+      const fieldAlias: IntrospectionField | undefined = (resource.type as IntrospectionObjectType).fields.find(
+        field => {
+          return field.name === fieldAliasResolver(field, key, acc, introspectionResults);
+        }
+      );
+
+      // If alias is found, copy alias property but keep the actual field name
+      if(fieldAlias){
+        field = {
+          ...fieldAlias,
+          name: key,
+        }
+      }
+    }
+    if (typeof field === 'undefined') {
+      // The field wasn't resolved still, ignore it
+      console.error(`Field "${key}" couldn't be resolved from introspection using resource "${resource.type.name}":`, resource);
+      return acc;
+    }
     const type = getFinalType(field.type);
 
     if (type.kind !== TypeKind.OBJECT) {
@@ -62,11 +82,11 @@ const sanitizeResource = (
   }, {});
 };
 
-export default (introspectionResults: IntrospectionResult, fieldLookup?: Function) => (
+export default (introspectionResults: IntrospectionResult, fieldAliasResolver?: Function) => (
   aorFetchType: string,
   resource: Resource
 ) => (response: { [key: string]: any }) => {
-  const sanitize = sanitizeResource(introspectionResults, resource, fieldLookup);
+  const sanitize = sanitizeResource(introspectionResults, resource, fieldAliasResolver);
   const data = response.data;
 
   if (

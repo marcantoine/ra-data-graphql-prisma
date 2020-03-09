@@ -6,7 +6,7 @@ import { DocumentNode } from 'graphql';
 
 export const buildQueryFactory = () => (
   introspectionResults: IntrospectionResult,
-  fieldLookup?: Function
+  fieldAliasResolver?: Function
 ) => {
   const knownResources = introspectionResults.resources.map(r => r.type.name);
 
@@ -48,7 +48,7 @@ export const buildQueryFactory = () => (
       variables,
       fragment
     );
-    const parseResponse = getResponseParser(introspectionResults, fieldLookup)(
+    const parseResponse = getResponseParser(introspectionResults, fieldAliasResolver)(
       aorFetchType,
       resource
     );
