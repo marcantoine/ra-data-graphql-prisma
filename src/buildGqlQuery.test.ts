@@ -3,8 +3,6 @@ import { CREATE, DELETE, GET_LIST, GET_MANY, GET_MANY_REFERENCE, GET_ONE, UPDATE
 import buildGqlQuery, { buildApolloArgs, buildArgs, buildFields, getArgType, Query } from './buildGqlQuery';
 import { IntrospectionResult, Resource } from './constants/interfaces';
 
-import './typings/ra-data-graphql';
-
 describe('getArgType', () => {
   it('returns the arg type', () => {
     expect(
