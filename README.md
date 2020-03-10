@@ -1,26 +1,58 @@
+<a href="https://unly.org"><img src="https://storage.googleapis.com/unly/images/ICON_UNLY.png" align="right" height="20" alt="Unly logo" title="Unly logo" /></a>
+[![Version][github-version-image]][github-version-url]
+[![Liscence][github-liscence-image]][github-liscence-url][![Releases][github-all-release-image]][github-all-release-url][![NPM Downloads][npm-downloads-image]][npm-downloads-url]
 [![Maintainability](https://api.codeclimate.com/v1/badges/f86e68cb7b3976d0e2ab/maintainability)](https://codeclimate.com/github/UnlyEd/ra-data-graphql-prisma/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/f86e68cb7b3976d0e2ab/test_coverage)](https://codeclimate.com/github/UnlyEd/ra-data-graphql-prisma/test_coverage)
 [![Build Status](https://travis-ci.com/UnlyEd/ra-data-graphql-prisma.svg?branch=master)](https://travis-ci.com/UnlyEd/ra-data-graphql-prisma)
 
 # @unly/ra-data-graphql-prisma
 
-`react-admin` data provider for Prisma
+`react-admin` data provider for Prisma (v1), used by https://github.com/UnlyEd/next-right-now-admin
 
-### Work in progress
-If you wanna give it a try anyway, here's a quick preview on codesandbox.
+## Why again another fork?
+
+A bit of history...
+
+- https://github.com/Weakky/ra-data-opencrud was created in 2018, but hasn't been updated since Oct. 2018
+- https://github.com/marcantoine/ra-data-graphql-prisma took over from `ra-data-opencrud` and is still maintained, it's also used in a production app (private)
+- https://github.com/UnlyEd/ra-data-graphql-prisma was created in 2020 from `ra-data-graphql-prisma`, because too many changes were needed and we needed to do them fast
+
+### Why use this one?
+- https://www.npmjs.com/search?q=ra-data-prisma lists 11 packages, there are no 1.0.0 version, everything is 0.x
+- All packages are at least 180kB, some even go up to 500+... **This one is around 90kB**
+- It's used by https://github.com/UnlyEd/next-right-now-admin, which features a real GraphCMS demo
+
+## Demo
+If you wanna give it a try, here's a quick preview on codesandbox.
 The API is hosted on Prisma's public servers, which means the API is limited to 10 API calls per seconds.
 Be aware that it might not be working because of that, or that performances may be poor.
 
 [![Edit ra-data-prisma](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/Weakky/ra-data-prisma/tree/master/examples/prisma-ecommerce)
 
-# Summary
+---
 
-- [What is react admin ? And what's that ?](#what-is-react-admin-?-and-what's-ra-data-opencrud-?)
+<!-- toc -->
+
+- [What is react admin ? And what's @unly/ra-data-graphql-prisma ?](#what-is-react-admin--and-whats-unlyra-data-graphql-prisma-)
 - [Installation](#installation)
-- [Usage](#installation)
+- [Usage](#usage)
 - [Options](#options)
+  * [Relation and references](#relation-and-references)
+  * [Customize the Apollo client](#customize-the-apollo-client)
+  * [Overriding a specific query](#overriding-a-specific-query)
+    + [With a whole query](#with-a-whole-query)
+    + [Or using fragments](#or-using-fragments)
+  * [Customize the introspection](#customize-the-introspection)
 - [Tips and workflow](#tips-and-workflow)
+  * [Performance issues](#performance-issues)
+    + [Suggested workflow](#suggested-workflow)
 - [Contributing](#contributing)
+  * [Known issues](#known-issues)
+    + [Yarn install error on fsevent](#yarn-install-error-on-fsevent)
+
+<!-- tocstop -->
+
+---
 
 ## What is react admin ? And what's @unly/ra-data-graphql-prisma ?
 
@@ -28,7 +60,7 @@ Be aware that it might not be working because of that, or that performances may 
 
 Prisma V1 offers a full graphQL CRUD Server out of the box. This module allows to use react-admin directly on Prisma Server.
 
-This module is a fork of `ra-data-opencrud`. 
+> This module is a fork of `ra-data-graphql-prisma`, itself a fork of `ra-data-opencrud`. 
 
 Since `ra-data-opencrud` maintainer focus on the future of back-end development with Prisma Framework (v2) and nexus-prisma, this fork allow us to maintain and fix some part of the module.
 
@@ -53,12 +85,12 @@ yarn add graphql @unly/ra-data-graphql-prisma
 
 ## Usage
 
-This example assumes a `Post` type is defined in your datamodel.
+> This example assumes a `Post` type is defined in your datamodel. It's based on `create-react-app`.
 
 ```js
 // in App.js
 import React, { Component } from 'react';
-import buildOpenCrudProvider from '@unly/ra-data-graphql-prisma';
+import buildGraphQLProvider from '@unly/ra-data-graphql-prisma';
 import { Admin, Resource, Delete } from 'react-admin';
 
 import { PostCreate, PostEdit, PostList } from './posts';
@@ -71,7 +103,7 @@ class App extends Component {
         this.state = { dataProvider: null };
     }
     componentDidMount() {
-        buildOpenCrudProvider({ clientOptions: { uri: 'your_prisma_or_graphcms_endpoint' }})
+        buildGraphQLProvider({ clientOptions: { uri: 'your_prisma_or_graphcms_endpoint' }})
             .then(dataProvider => this.setState({ dataProvider }));
     }
 
@@ -93,7 +125,7 @@ class App extends Component {
 export default App;
 ```
 
-And that's it, `buildOpenCrudProvider` will create a default ApolloClient for you and run an [introspection](http://graphql.org/learn/introspection/) query on your Prisma/GraphCMS endpoint, listing all potential resources.
+And that's it, `buildGraphQLProvider` will create a default ApolloClient for you and run an [introspection](http://graphql.org/learn/introspection/) query on your Prisma/GraphCMS endpoint, listing all potential resources.
 
 ## Options
 
@@ -112,16 +144,16 @@ The reference in a ReferenceArrayField is with camelCase : this field has not be
 
 ### Customize the Apollo client
 
-You can either supply the client options by calling `buildOpenCrudProvider` like this:
+You can either supply the client options by calling `buildGraphQLProvider` like this:
 
 ```js
-buildOpenCrudProvider({ clientOptions: { uri: 'your_prisma_or_graphcms_endpoint', ...otherApolloOptions } });
+buildGraphQLProvider({ clientOptions: { uri: 'your_prisma_or_graphcms_endpoint', ...otherApolloOptions } });
 ```
 
 Or supply your client directly with:
 
 ```js
-buildOpenCrudProvider({ client: myClient });
+buildGraphQLProvider({ client: myClient });
 ```
 
 ### Overriding a specific query
@@ -132,7 +164,7 @@ The default behavior might not be optimized especially when dealing with referen
 
 ```js
 // in src/dataProvider.js
-import buildOpenCrudProvider, { buildQuery } from '@unly/ra-data-graphql-prisma';
+import buildGraphQLProvider, { buildQuery } from '@unly/ra-data-graphql-prisma';
 
 const enhanceBuildQuery = introspection => (fetchType, resource, params) => {
     const builtQuery = buildQuery(introspection)(fetchType, resource, params);
@@ -160,7 +192,7 @@ const enhanceBuildQuery = introspection => (fetchType, resource, params) => {
     return builtQuery;
 }
 
-export default buildOpenCrudProvider({ buildQuery: enhanceBuildQuery })
+export default buildGraphQLProvider({ buildQuery: enhanceBuildQuery })
 ```
 
 #### Or using fragments
@@ -171,7 +203,7 @@ You can also override a query using the same API `graphql-binding` offers.
 
 ```js
 // in src/dataProvider.js
-import buildOpenCrudProvider, { buildQuery } from '@unly/ra-data-graphql-prisma';
+import buildGraphQLProvider, { buildQuery } from '@unly/ra-data-graphql-prisma';
 
 const enhanceBuildQuery = introspection => (fetchType, resource, params) => {
     if (resource === 'Command' && fetchType === 'GET_ONE') {
@@ -186,7 +218,7 @@ const enhanceBuildQuery = introspection => (fetchType, resource, params) => {
     return buildQuery(introspection)(fetchType, resource, params);
 }
 
-export default buildOpenCrudProvider({ buildQuery: enhanceBuildQuery })
+export default buildGraphQLProvider({ buildQuery: enhanceBuildQuery })
 ```
 
 As this approach can become really cumbersome, you can find a more elegant way to pass fragments in the example under `/examples/prisma-ecommerce` 
@@ -222,7 +254,7 @@ const introspectionOptions = {
 };
 ```
 
-**Note**: `exclude` and `include` are mutualy exclusives and `include` will take precendance.
+**Note**: `exclude` and `include` are mutually exclusives and `include` will take precedence.
 
 **Note**: When using functions, the `type` argument will be a type returned by the introspection query. Refer to the [introspection](http://graphql.org/learn/introspection/) documentation for more information.
 
@@ -288,3 +320,108 @@ yarn cache clean && yarn upgrade && yarn
 ```
 
 Related issues : https://github.com/yarnpkg/yarn/issues/3926
+
+
+
+---
+
+# Contributing
+
+We gladly accept PRs, but please open an issue first so we can discuss it beforehand.
+
+## Working locally
+
+```
+yarn start # Shortcut - Runs linter + build + tests in concurrent mode (watch mode)
+
+OR run each process separately for finer control
+
+yarn lint
+yarn build
+yarn test
+```
+
+## Test
+
+```
+yarn test # Run all tests, interactive and watch mode
+yarn test:once
+yarn test:coverage
+```
+
+## Versions
+
+### SemVer
+
+We use Semantic Versioning for this project: https://semver.org/. (`vMAJOR.MINOR.PATCH`: `v1.0.1`)
+
+- Major version: Must be changed when Breaking Changes are made (public API isn't backward compatible).
+  - A function has been renamed/removed from the public API
+  - Something has changed that will cause the app to behave differently with the same configuration
+- Minor version: Must be changed when a new feature is added or updated (without breaking change nor behavioral change)
+- Patch version: Must be changed when any change is made that isn't either Major nor Minor. (Misc, doc, etc.)
+
+## Releasing and publishing
+
+```
+yarn releaseAndPublish # Shortcut - Will prompt for bump version, commit, create git tag, push commit/tag and publish to NPM
+
+yarn release # Will prompt for bump version, commit, create git tag, push commit/tag
+npm publish # Will publish to NPM
+```
+
+> Don't forget we are using SemVer, please follow our SemVer rules.
+
+**Pro hint**: use `beta` tag if you're in a work-in-progress (or unsure) to avoid releasing WIP versions that looks legit
+
+---
+
+# Changelog
+
+> Our API change (including breaking changes and "how to migrate") are documented in the Changelog.
+
+See [changelog](./CHANGELOG.md)
+
+---
+
+# License
+
+MIT
+
+# Vulnerability disclosure
+
+[See our policy](https://github.com/UnlyEd/Unly).
+
+---
+
+# Contributors and maintainers
+
+This project is being maintained by:
+- [Unly] Ambroise Dhenain ([Vadorequest](https://github.com/vadorequest)) **(active)**
+
+---
+
+# **[ABOUT UNLY]** <a href="https://unly.org"><img src="https://storage.googleapis.com/unly/images/ICON_UNLY.png" height="40" align="right" alt="Unly logo" title="Unly logo" /></a>
+
+> [Unly](https://unly.org) is a socially responsible company, fighting inequality and facilitating access to higher education. 
+> Unly is committed to making education more inclusive, through responsible funding for students. 
+We provide technological solutions to help students find the necessary funding for their studies. 
+We proudly participate in many TechForGood initiatives. To support and learn more about our actions to make education accessible, visit : 
+- https://twitter.com/UnlyEd
+- https://www.facebook.com/UnlyEd/
+- https://www.linkedin.com/company/unly
+- [Interested to work with us?](https://jobs.zenploy.io/unly/about)
+
+Tech tips and tricks from our CTO on our [Medium page](https://medium.com/unly-org/tech/home)!
+
+#TECHFORGOOD #EDUCATIONFORALL
+
+
+[github-all-release-image]: https://img.shields.io/github/downloads/UnlyEd/ra-data-graphql-prisma/total
+[github-all-release-url]: https://github.com/UnlyEd/ra-data-graphql-prisma/releases
+[github-liscence-image]: https://img.shields.io/github/license/UnlyEd/ra-data-graphql-prisma
+[github-liscence-url]: ./LICENSE
+[github-version-image]: https://img.shields.io/github/package-json/v/UnlyEd/ra-data-graphql-prisma
+[github-version-url]: ./package.json
+[npm-downloads-url]: https://www.npmjs.com/package/@unly/ra-data-graphql-prisma
+[npm-downloads-image]: https://img.shields.io/npm/dm/@unly/ra-data-graphql-prisma
