@@ -6028,7 +6028,7 @@ query-string@^5.1.1:
     object-assign "^4.1.0"
     strict-uri-encode "^1.0.0"
 
-ra-core@3.3.0, ra-core@^3.3.0:
+ra-core@^3.3.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/ra-core/-/ra-core-3.3.0.tgz#5da4b2059c46eeaf59154fd475374e7a5e213dd8"
   integrity sha512-D/Yp9PeMiaa6xKinbBH2cmy/G+Bkj1LMM5auRjG6qkoXc8U6oiqOmY2M4ZCO8LH7Kwujr5tyeW7gj3oU6c0hgg==

@@ -95,7 +95,6 @@
     "jest": "25.1.0",
     "jest-extended": "0.11.5",
     "markdown-toc": "1.2.0",
-    "ra-core": "3.3.0",
     "react": "16.13.0",
     "react-admin": "3.3.0",
     "react-dom": "16.13.0",
