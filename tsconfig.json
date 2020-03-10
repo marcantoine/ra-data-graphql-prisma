@@ -25,7 +25,7 @@
     "removeComments": true,
     "typeRoots": [
       "node_modules/@types",
-      "src/typings/*"
+      "src/typings"
     ]
   },
   "include": [
