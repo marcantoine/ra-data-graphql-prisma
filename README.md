@@ -1,4 +1,4 @@
-# ra-data-graphql-prisma
+# @unly/ra-data-graphql-prisma
 
 `react-admin` data provider for Prisma
 
@@ -18,7 +18,7 @@ Be aware that it might not be working because of that, or that performances may 
 - [Tips and workflow](#tips-and-workflow)
 - [Contributing](#contributing)
 
-## What is react admin ? And what's ra-data-graphql-prisma ?
+## What is react admin ? And what's @unly/ra-data-graphql-prisma ?
 
 [Find out more about the benefits of using `react-admin` with Prisma here.](context.md) 
 
@@ -38,13 +38,13 @@ This module is not compatible with Prisma (2) Framework & nexus-prisma.
 Install with:
 
 ```sh
-npm install --save graphql ra-data-graphql-prisma
+npm install --save graphql @unly/ra-data-graphql-prisma
 ```
 
 or
 
 ```sh
-yarn add graphql ra-data-graphql-prisma
+yarn add graphql @unly/ra-data-graphql-prisma
 ```
 
 ## Usage
@@ -54,7 +54,7 @@ This example assumes a `Post` type is defined in your datamodel.
 ```js
 // in App.js
 import React, { Component } from 'react';
-import buildOpenCrudProvider from 'ra-data-graphql-prisma';
+import buildOpenCrudProvider from '@unly/ra-data-graphql-prisma';
 import { Admin, Resource, Delete } from 'react-admin';
 
 import { PostCreate, PostEdit, PostList } from './posts';
@@ -95,7 +95,7 @@ And that's it, `buildOpenCrudProvider` will create a default ApolloClient for yo
 
 ### Relation and references
 
-In order to link to reference record using ReferenceField or ReferenceInput, `ra-data-graphql-prisma` uses a object notation (instead of snake_case or camelCase as seen in the react-admin documentation)
+In order to link to reference record using ReferenceField or ReferenceInput, `@unly/ra-data-graphql-prisma` uses a object notation (instead of snake_case or camelCase as seen in the react-admin documentation)
 
 ```js
 <ReferenceInput source="company.id" reference="Company">
@@ -128,7 +128,7 @@ The default behavior might not be optimized especially when dealing with referen
 
 ```js
 // in src/dataProvider.js
-import buildOpenCrudProvider, { buildQuery } from 'ra-data-graphql-prisma';
+import buildOpenCrudProvider, { buildQuery } from '@unly/ra-data-graphql-prisma';
 
 const enhanceBuildQuery = introspection => (fetchType, resource, params) => {
     const builtQuery = buildQuery(introspection)(fetchType, resource, params);
@@ -167,7 +167,7 @@ You can also override a query using the same API `graphql-binding` offers.
 
 ```js
 // in src/dataProvider.js
-import buildOpenCrudProvider, { buildQuery } from 'ra-data-graphql-prisma';
+import buildOpenCrudProvider, { buildQuery } from '@unly/ra-data-graphql-prisma';
 
 const enhanceBuildQuery = introspection => (fetchType, resource, params) => {
     if (resource === 'Command' && fetchType === 'GET_ONE') {
@@ -250,16 +250,16 @@ As overriding all queries can be cumbersome, **this should be done progressively
 
 ## Contributing
 
-Use the example under `examples/prisma-ecommerce` as a playground for improving `ra-data-graphql-prisma`.
+Use the example under `examples/prisma-ecommerce` as a playground for improving `@unly/ra-data-graphql-prisma`.
 
-To easily enhance `ra-data-graphql-prisma` and get the changes reflected on `examples/prisma-ecommerce`, do the following:
+To easily enhance `@unly/ra-data-graphql-prisma` and get the changes reflected on `examples/prisma-ecommerce`, do the following:
 
-- `cd ra-data-graphql-prisma`
+- `cd @unly/ra-data-graphql-prisma`
 - `yarn link`
 - `cd examples/prisma-ecommerce`
-- `yarn link ra-data-graphql-prisma`
+- `yarn link @unly/ra-data-graphql-prisma`
 
-Once this is done, the `ra-data-graphql-prisma` dependency will be replaced by the one on the repository.
+Once this is done, the `@unly/ra-data-graphql-prisma` dependency will be replaced by the one on the repository.
 **One last thing, don't forget to transpile the library with babel by running the following command on the root folder**
 
 

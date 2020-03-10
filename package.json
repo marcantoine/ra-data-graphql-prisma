@@ -1,17 +1,17 @@
 {
-  "name": "ra-data-graphql-prisma",
+  "name": "@unly/ra-data-graphql-prisma",
   "version": "0.0.10",
   "description": "A react-admin data provider for Prisma Server",
   "main": "dist/index.js",
   "sideEffects": false,
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/marcantoine/ra-data-graphql-prisma.git"
+    "url": "git+https://github.com/UnlyEd/ra-data-graphql-prisma.git"
   },
   "bugs": {
-    "url": "https://github.com/marcantoine/ra-data-graphql-prisma/issues"
+    "url": "https://github.com/UnlyEd/ra-data-graphql-prisma/issues"
   },
-  "homepage": "https://github.com/marcantoine/ra-data-graphql-prisma#readme",
+  "homepage": "https://github.com/UnlyEd/ra-data-graphql-prisma#readme",
   "authors": [
     "Flavian DESVERNE",
     "Marc-Antoine FONNE"
