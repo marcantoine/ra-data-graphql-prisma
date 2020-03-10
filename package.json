@@ -10,7 +10,7 @@
     "lint:once": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
     "lint:fix:preview": "eslint src --ext .ts --fix-dry-run",
-    "preversion": "yarn test:once && yarn doc:toc && yarn run doc:api",
+    "preversion": "yarn test:once && yarn doc:toc",
     "postversion": "git push && git push --tags",
     "prepublishOnly": "yarn clean && yarn build:once && yarn publish:preview && cli-confirm \"Do you really want to release a new version? Please check the files that will be publicly released first. (y/n)\"",
     "publish:preview": "npm pack && tar -xvzf *.tgz && rm -rf package *.tgz",
