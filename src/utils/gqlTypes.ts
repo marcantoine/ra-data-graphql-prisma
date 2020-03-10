@@ -15,7 +15,7 @@ import {
   TypeNode,
   ValueNode,
   VariableDefinitionNode,
-  VariableNode
+  VariableNode,
 } from 'graphql';
 
 // Functional utils to easily build GraphQL ASTs
@@ -23,76 +23,76 @@ import {
 
 export const document = (definitions: DefinitionNode[]): DocumentNode => ({
   kind: Kind.DOCUMENT,
-  definitions
+  definitions,
 });
 
 export const operationDefinition = (
   operation: OperationTypeNode,
   selectionSet: SelectionSetNode,
   name: NameNode,
-  variableDefinitions: VariableDefinitionNode[]
+  variableDefinitions: VariableDefinitionNode[],
 ): OperationDefinitionNode => ({
   kind: Kind.OPERATION_DEFINITION,
   operation,
   selectionSet,
   name,
-  variableDefinitions
+  variableDefinitions,
 });
 
 export const selectionSet = (
-  selections: SelectionNode[]
+  selections: SelectionNode[],
 ): SelectionSetNode => ({
   kind: Kind.SELECTION_SET,
-  selections
+  selections,
 });
 
 export const field = (
   name: NameNode,
-  optionalValues: Partial<FieldNode> = {}
+  optionalValues: Partial<FieldNode> = {},
 ): FieldNode => ({
   kind: Kind.FIELD,
   name,
-  ...optionalValues
+  ...optionalValues,
 });
 
 export const listType = (type: TypeNode): ListTypeNode => ({
   kind: Kind.LIST_TYPE,
-  type
+  type,
 });
 
 export const nonNullType = (
-  type: NamedTypeNode | ListTypeNode
+  type: NamedTypeNode | ListTypeNode,
 ): NonNullTypeNode => ({
   kind: Kind.NON_NULL_TYPE,
-  type
+  type,
 });
 
 export const variableDefinition = (
   variable: VariableNode,
-  type: TypeNode
+  type: TypeNode,
 ): VariableDefinitionNode => ({
   kind: Kind.VARIABLE_DEFINITION,
   variable,
-  type
+  type,
 });
 
 export const variable = (name: NameNode): VariableNode => ({
   kind: Kind.VARIABLE,
-  name
+  name,
 });
 
 export const name = (value: string): NameNode => ({
   kind: Kind.NAME,
-  value
+  value,
 });
 
 export const namedType = (name: NameNode): NamedTypeNode => ({
   kind: Kind.NAMED_TYPE,
-  name
+  name,
 });
 
 export const argument = (name: NameNode, value: ValueNode): ArgumentNode => ({
   kind: Kind.ARGUMENT,
   name,
-  value
+  value,
 });

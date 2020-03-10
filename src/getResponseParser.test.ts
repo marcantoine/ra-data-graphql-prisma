@@ -13,37 +13,37 @@ const testListTypes = (type: string) => {
             name: 'id',
             type: {
               kind: TypeKind.NON_NULL,
-              ofType: { kind: TypeKind.SCALAR }
-            }
+              ofType: { kind: TypeKind.SCALAR },
+            },
           },
           {
             name: 'title',
             type: {
               kind: TypeKind.NON_NULL,
-              ofType: { kind: TypeKind.SCALAR }
-            }
+              ofType: { kind: TypeKind.SCALAR },
+            },
           },
           {
             name: 'tags',
             type: {
               kind: TypeKind.LIST,
-              ofType: { kind: TypeKind.OBJECT, name: 'Tag' }
-            }
+              ofType: { kind: TypeKind.OBJECT, name: 'Tag' },
+            },
           },
           { name: 'embeddedJson', type: { kind: TypeKind.OBJECT } },
           {
             name: 'author',
             type: {
               kind: TypeKind.NON_NULL,
-              ofType: { kind: TypeKind.OBJECT, name: 'User' }
-            }
+              ofType: { kind: TypeKind.OBJECT, name: 'User' },
+            },
           },
           {
             name: 'coauthor',
-            type: { kind: TypeKind.OBJECT, name: 'User' }
-          }
-        ]
-      }
+            type: { kind: TypeKind.OBJECT, name: 'User' },
+          },
+        ],
+      },
     };
 
     const introspectionResults = {
@@ -55,22 +55,22 @@ const testListTypes = (type: string) => {
               { name: 'id', type: { kind: TypeKind.SCALAR } },
               {
                 name: 'firstName',
-                type: { kind: TypeKind.SCALAR }
-              }
-            ]
-          }
+                type: { kind: TypeKind.SCALAR },
+              },
+            ],
+          },
         },
         {
           type: {
             name: 'Tag',
             fields: [
               { name: 'id', type: { kind: TypeKind.SCALAR } },
-              { name: 'name', type: { kind: TypeKind.SCALAR } }
-            ]
-          }
-        }
+              { name: 'name', type: { kind: TypeKind.SCALAR } },
+            ],
+          },
+        },
       ],
-      types: [{ name: 'User' }, { name: 'Tag' }]
+      types: [{ name: 'User' }, { name: 'Tag' }],
     };
     const response = {
       data: {
@@ -83,9 +83,9 @@ const testListTypes = (type: string) => {
             coauthor: null,
             tags: [
               { id: 'tag1', name: 'tag1 name' },
-              { id: 'tag2', name: 'tag2 name' }
+              { id: 'tag2', name: 'tag2 name' },
             ],
-            embeddedJson: { foo: 'bar' }
+            embeddedJson: { foo: 'bar' },
           },
           {
             _typeName: 'Post',
@@ -95,20 +95,20 @@ const testListTypes = (type: string) => {
             coauthor: null,
             tags: [
               { id: 'tag1', name: 'tag1 name' },
-              { id: 'tag3', name: 'tag3 name' }
+              { id: 'tag3', name: 'tag3 name' },
             ],
-            embeddedJson: { foo: 'bar' }
-          }
+            embeddedJson: { foo: 'bar' },
+          },
         ],
-        total: { aggregate: { count: 100 } }
-      }
+        total: { aggregate: { count: 100 } },
+      },
     };
 
     expect(
       getResponseParser(introspectionResults as IntrospectionResult)(
         type,
-        resource as Resource
-      )(response)
+        resource as Resource,
+      )(response),
     ).toEqual({
       data: [
         {
@@ -118,10 +118,10 @@ const testListTypes = (type: string) => {
           author: { id: 'author1', firstName: 'Toto' },
           tags: [
             { id: 'tag1', name: 'tag1 name' },
-            { id: 'tag2', name: 'tag2 name' }
+            { id: 'tag2', name: 'tag2 name' },
           ],
           tagsIds: ['tag1', 'tag2'],
-          embeddedJson: { foo: 'bar' }
+          embeddedJson: { foo: 'bar' },
         },
         {
           id: 'post2',
@@ -130,13 +130,13 @@ const testListTypes = (type: string) => {
           author: { id: 'author1', firstName: 'Toto' },
           tags: [
             { id: 'tag1', name: 'tag1 name' },
-            { id: 'tag3', name: 'tag3 name' }
+            { id: 'tag3', name: 'tag3 name' },
           ],
           tagsIds: ['tag1', 'tag3'],
-          embeddedJson: { foo: 'bar' }
-        }
+          embeddedJson: { foo: 'bar' },
+        },
       ],
-      total: 100
+      total: 100,
     });
   });
 };
@@ -151,37 +151,37 @@ const testSingleTypes = (type: string) => {
             name: 'id',
             type: {
               kind: TypeKind.NON_NULL,
-              ofType: { kind: TypeKind.SCALAR }
-            }
+              ofType: { kind: TypeKind.SCALAR },
+            },
           },
           {
             name: 'title',
             type: {
               kind: TypeKind.NON_NULL,
-              ofType: { kind: TypeKind.SCALAR }
-            }
+              ofType: { kind: TypeKind.SCALAR },
+            },
           },
           {
             name: 'tags',
             type: {
               kind: TypeKind.LIST,
-              ofType: { kind: TypeKind.OBJECT, name: 'Tag' }
-            }
+              ofType: { kind: TypeKind.OBJECT, name: 'Tag' },
+            },
           },
           { name: 'embeddedJson', type: { kind: TypeKind.OBJECT } },
           {
             name: 'author',
             type: {
               kind: TypeKind.NON_NULL,
-              ofType: { kind: TypeKind.OBJECT, name: 'User' }
-            }
+              ofType: { kind: TypeKind.OBJECT, name: 'User' },
+            },
           },
           {
             name: 'coauthor',
-            type: { kind: TypeKind.OBJECT, name: 'User' }
-          }
-        ]
-      }
+            type: { kind: TypeKind.OBJECT, name: 'User' },
+          },
+        ],
+      },
     };
 
     const introspectionResults = {
@@ -193,22 +193,22 @@ const testSingleTypes = (type: string) => {
               { name: 'id', type: { kind: TypeKind.SCALAR } },
               {
                 name: 'firstName',
-                type: { kind: TypeKind.SCALAR }
-              }
-            ]
-          }
+                type: { kind: TypeKind.SCALAR },
+              },
+            ],
+          },
         },
         {
           type: {
             name: 'Tag',
             fields: [
               { name: 'id', type: { kind: TypeKind.SCALAR } },
-              { name: 'name', type: { kind: TypeKind.SCALAR } }
-            ]
-          }
-        }
+              { name: 'name', type: { kind: TypeKind.SCALAR } },
+            ],
+          },
+        },
       ],
-      types: [{ name: 'User' }, { name: 'Tag' }]
+      types: [{ name: 'User' }, { name: 'Tag' }],
     };
     const response = {
       data: {
@@ -220,17 +220,17 @@ const testSingleTypes = (type: string) => {
           coauthor: null,
           tags: [
             { id: 'tag1', name: 'tag1 name' },
-            { id: 'tag2', name: 'tag2 name' }
+            { id: 'tag2', name: 'tag2 name' },
           ],
-          embeddedJson: { foo: 'bar' }
-        }
-      }
+          embeddedJson: { foo: 'bar' },
+        },
+      },
     };
     expect(
       getResponseParser(introspectionResults as IntrospectionResult)(
         type,
-        resource as Resource
-      )(response)
+        resource as Resource,
+      )(response),
     ).toEqual({
       data: {
         id: 'post1',
@@ -239,11 +239,11 @@ const testSingleTypes = (type: string) => {
         author: { id: 'author1', firstName: 'Toto' },
         tags: [
           { id: 'tag1', name: 'tag1 name' },
-          { id: 'tag2', name: 'tag2 name' }
+          { id: 'tag2', name: 'tag2 name' },
         ],
         tagsIds: ['tag1', 'tag2'],
-        embeddedJson: { foo: 'bar' }
-      }
+        embeddedJson: { foo: 'bar' },
+      },
     });
   });
 };

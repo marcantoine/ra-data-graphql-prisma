@@ -5,10 +5,10 @@ describe('buildQuery', () => {
 
   const resource = {
     type: { name: 'Post' },
-    GET_LIST: queryType
+    GET_LIST: queryType,
   };
   const introspectionResults = {
-    resources: [resource]
+    resources: [resource],
   };
 
   it('throws an error if resource is unknown', () => {
@@ -17,10 +17,10 @@ describe('buildQuery', () => {
         'GET_LIST',
         'Comment',
         {} as any,
-        {} as any
-      )
+        {} as any,
+      ),
     ).toThrow(
-      'Unknown resource Comment. Make sure it has been declared on your server side schema. Known resources are Post'
+      'Unknown resource Comment. Make sure it has been declared on your server side schema. Known resources are Post',
     );
   });
 
@@ -30,10 +30,10 @@ describe('buildQuery', () => {
         'CREATE',
         'Post',
         {} as any,
-        {} as any
-      )
+        {} as any,
+      ),
     ).toThrow(
-      'No query or mutation matching aor fetch type CREATE could be found for resource Post'
+      'No query or mutation matching aor fetch type CREATE could be found for resource Post',
     );
   });
 });

@@ -5,11 +5,11 @@ import { IntrospectionListTypeRef, IntrospectionNamedTypeRef, IntrospectionNonNu
  * @param {GraphQLType} type
  */
 const getFinalType = (
-  type: IntrospectionTypeRef
+  type: IntrospectionTypeRef,
 ): IntrospectionNamedTypeRef => {
   if (type.kind === TypeKind.NON_NULL || type.kind === TypeKind.LIST) {
     return getFinalType(
-      (type as IntrospectionListTypeRef | IntrospectionNonNullTypeRef).ofType!
+      (type as IntrospectionListTypeRef | IntrospectionNonNullTypeRef).ofType!,
     );
   }
 

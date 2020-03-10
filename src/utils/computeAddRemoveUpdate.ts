@@ -23,5 +23,5 @@ export const computeFieldsToUpdate = (oldIds: ID[], newIds: ID[]) => {
 export const computeFieldsToAddRemoveUpdate = (oldIds: [], newIds: []) => ({
   fieldsToAdd: computeFieldsToAdd(oldIds, newIds),
   fieldsToRemove: computeFieldsToRemove(oldIds, newIds),
-  fieldsToUpdate: computeFieldsToUpdate(oldIds, newIds)
+  fieldsToUpdate: computeFieldsToUpdate(oldIds, newIds),
 });

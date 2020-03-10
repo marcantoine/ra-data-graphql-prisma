@@ -7,7 +7,7 @@ import {
   parse,
   SelectionNode,
   TypeKind,
-  VariableDefinitionNode
+  VariableDefinitionNode,
 } from 'graphql';
 import { DELETE, GET_LIST, GET_MANY, GET_MANY_REFERENCE } from 'ra-core';
 import { QUERY_TYPES } from 'ra-data-graphql';
@@ -24,7 +24,7 @@ export interface Query {
 }
 
 export const buildFields = (introspectionResults: IntrospectionResult) => (
-  fields: IntrospectionField[]
+  fields: IntrospectionField[],
 ): FieldNode[] => {
   return fields.reduce(
     (acc: FieldNode[], field) => {
@@ -39,7 +39,7 @@ export const buildFields = (introspectionResults: IntrospectionResult) => (
       }
 
       const linkedResource = introspectionResults.resources.find(
-        r => r.type.name === type.name
+        r => r.type.name === type.name,
       );
 
       if (linkedResource) {
@@ -47,14 +47,14 @@ export const buildFields = (introspectionResults: IntrospectionResult) => (
           ...acc,
           gqlTypes.field(gqlTypes.name(field.name), {
             selectionSet: gqlTypes.selectionSet([
-              gqlTypes.field(gqlTypes.name('id'))
-            ])
-          })
+              gqlTypes.field(gqlTypes.name('id')),
+            ]),
+          }),
         ];
       }
 
       const linkedType = introspectionResults.types.find(
-        t => t.name === type.name
+        t => t.name === type.name,
       );
 
       if (linkedType) {
@@ -64,10 +64,10 @@ export const buildFields = (introspectionResults: IntrospectionResult) => (
             selectionSet: gqlTypes.selectionSet(
               buildFields(introspectionResults)(
                 // @ts-ignore
-                (linkedType as IntrospectionObjectType).fields
-              )
-            )
-          })
+                (linkedType as IntrospectionObjectType).fields,
+              ),
+            ),
+          }),
         ];
       }
 
@@ -75,7 +75,7 @@ export const buildFields = (introspectionResults: IntrospectionResult) => (
       // ending with endless circular dependencies
       return acc;
     },
-    [] as FieldNode[]
+    [] as FieldNode[],
   );
 };
 
@@ -87,7 +87,7 @@ export const getArgType = (arg: IntrospectionField) => {
   if (list) {
     if (required) {
       return gqlTypes.listType(
-        gqlTypes.nonNullType(gqlTypes.namedType(gqlTypes.name(type.name)))
+        gqlTypes.nonNullType(gqlTypes.namedType(gqlTypes.name(type.name))),
       );
     }
     return gqlTypes.listType(gqlTypes.namedType(gqlTypes.name(type.name)));
@@ -102,14 +102,14 @@ export const getArgType = (arg: IntrospectionField) => {
 
 export const buildArgs = (
   query: Query,
-  variables: { [key: string]: any } = {}
+  variables: { [key: string]: any } = {},
 ) => {
   if (query.args.length === 0) {
     return [];
   }
 
   const validVariables = Object.keys(variables).filter(
-    k => typeof variables[k] !== 'undefined'
+    k => typeof variables[k] !== 'undefined',
   );
   return query.args
     .filter(arg => validVariables.includes(arg.name))
@@ -118,23 +118,23 @@ export const buildArgs = (
         ...acc,
         gqlTypes.argument(
           gqlTypes.name(arg.name),
-          gqlTypes.variable(gqlTypes.name(arg.name))
-        )
+          gqlTypes.variable(gqlTypes.name(arg.name)),
+        ),
       ],
-      [] as ArgumentNode[]
+      [] as ArgumentNode[],
     );
 };
 
 export const buildApolloArgs = (
   query: Query,
-  variables: { [key: string]: any } = {}
+  variables: { [key: string]: any } = {},
 ) => {
   if (query.args.length === 0) {
     return [];
   }
 
   const validVariables = Object.keys(variables).filter(
-    k => typeof variables[k] !== 'undefined'
+    k => typeof variables[k] !== 'undefined',
   );
 
   return query.args
@@ -144,10 +144,10 @@ export const buildApolloArgs = (
         ...acc,
         gqlTypes.variableDefinition(
           gqlTypes.variable(gqlTypes.name(arg.name)),
-          getArgType(arg)
-        )
+          getArgType(arg),
+        ),
       ],
-      [] as VariableDefinitionNode[]
+      [] as VariableDefinitionNode[],
     );
 };
 
@@ -155,7 +155,7 @@ export const buildApolloArgs = (
 const buildFieldsFromFragment = (
   fragment: DocumentNode | string,
   resourceName: string,
-  fetchType: string
+  fetchType: string,
 ): SelectionNode[] => {
   let parsedFragment = {};
 
@@ -178,7 +178,7 @@ const buildFieldsFromFragment = (
       throw new Error(
         `Invalid fragment given for resource '${resourceName}' and fetchType '${fetchType}' (${
           e.message
-        }).`
+        }).`,
       );
     }
   }
@@ -191,7 +191,7 @@ export default (introspectionResults: IntrospectionResult) => (
   aorFetchType: string,
   queryType: Query,
   variables: { [key: string]: any },
-  fragment: DocumentNode
+  fragment: DocumentNode,
 ) => {
   const { orderBy, skip, first, ...countVariables } = variables;
   const apolloArgs = buildApolloArgs(queryType, variables);
@@ -201,7 +201,7 @@ export default (introspectionResults: IntrospectionResult) => (
     ? buildFieldsFromFragment(fragment, resource.type.name, aorFetchType)
     : buildFields(introspectionResults)(
       // @ts-ignore
-      (resource.type as IntrospectionObjectType).fields
+      (resource.type as IntrospectionObjectType).fields,
     );
 
   if (
@@ -216,7 +216,7 @@ export default (introspectionResults: IntrospectionResult) => (
           gqlTypes.field(gqlTypes.name(queryType.name!), {
             alias: gqlTypes.name('items'),
             arguments: args,
-            selectionSet: gqlTypes.selectionSet(fields)
+            selectionSet: gqlTypes.selectionSet(fields),
           }),
           gqlTypes.field(gqlTypes.name(`${queryType.name}Connection`), {
             alias: gqlTypes.name('total'),
@@ -224,15 +224,15 @@ export default (introspectionResults: IntrospectionResult) => (
             selectionSet: gqlTypes.selectionSet([
               gqlTypes.field(gqlTypes.name('aggregate'), {
                 selectionSet: gqlTypes.selectionSet([
-                  gqlTypes.field(gqlTypes.name('count'))
-                ])
-              })
-            ])
-          })
+                  gqlTypes.field(gqlTypes.name('count')),
+                ]),
+              }),
+            ]),
+          }),
         ]),
         gqlTypes.name(queryType.name!),
-        apolloArgs
-      )
+        apolloArgs,
+      ),
     ]);
   }
 
@@ -245,13 +245,13 @@ export default (introspectionResults: IntrospectionResult) => (
             alias: gqlTypes.name('data'),
             arguments: args,
             selectionSet: gqlTypes.selectionSet([
-              gqlTypes.field(gqlTypes.name('id'))
-            ])
-          })
+              gqlTypes.field(gqlTypes.name('id')),
+            ]),
+          }),
         ]),
         gqlTypes.name(queryType.name!),
-        apolloArgs
-      )
+        apolloArgs,
+      ),
     ]);
   }
 
@@ -262,11 +262,11 @@ export default (introspectionResults: IntrospectionResult) => (
         gqlTypes.field(gqlTypes.name(queryType.name!), {
           alias: gqlTypes.name('data'),
           arguments: args,
-          selectionSet: gqlTypes.selectionSet(fields)
-        })
+          selectionSet: gqlTypes.selectionSet(fields),
+        }),
       ]),
       gqlTypes.name(queryType.name!),
-      apolloArgs
-    )
+      apolloArgs,
+    ),
   ]);
 };

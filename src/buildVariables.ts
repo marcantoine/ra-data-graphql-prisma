@@ -19,7 +19,7 @@ interface GetListParams {
 const buildGetListVariables = (introspectionResults: IntrospectionResult) => (
   resource: Resource,
   aorFetchType: string,
-  params: GetListParams
+  params: GetListParams,
 ) => {
   const filter = Object.keys(params.filter).reduce((acc, key) => {
     if (key === 'ids') {
@@ -29,14 +29,14 @@ const buildGetListVariables = (introspectionResults: IntrospectionResult) => (
     if (Array.isArray(params.filter[key])) {
 
       const type = introspectionResults.types.find(
-        t => t.name === `${resource.type.name}WhereInput`
+        t => t.name === `${resource.type.name}WhereInput`,
       ) as IntrospectionInputObjectType;
       const inputField = type.inputFields.find(t => t.name === key);
 
       if (!!inputField) {
         return {
           ...acc,
-          [key]: { id_in: params.filter[key] }
+          [key]: { id_in: params.filter[key] },
         };
       }
     }
@@ -44,7 +44,7 @@ const buildGetListVariables = (introspectionResults: IntrospectionResult) => (
     if (isObject(params.filter[key])) {
 
       const type = introspectionResults.types.find(
-        t => t.name === `${resource.type.name}WhereInput`
+        t => t.name === `${resource.type.name}WhereInput`,
       ) as IntrospectionInputObjectType;
       const filterSome = type.inputFields.find(t => t.name === `${key}_some`);
 
@@ -52,9 +52,9 @@ const buildGetListVariables = (introspectionResults: IntrospectionResult) => (
         const filter = Object.keys(params.filter[key]).reduce(
           (acc, k: string) => ({
             ...acc,
-            [`${k}_in`]: params.filter[key][k] as string[]
+            [`${k}_in`]: params.filter[key][k] as string[],
           }),
-          {} as { [key: string]: string[] }
+          {} as { [key: string]: string[] },
         );
         return { ...acc, [`${key}_some`]: filter };
       }
@@ -65,16 +65,16 @@ const buildGetListVariables = (introspectionResults: IntrospectionResult) => (
     if (parts.length > 1) {
       if (parts[1] == 'id') {
         const type = introspectionResults.types.find(
-          t => t.name === `${resource.type.name}WhereInput`
+          t => t.name === `${resource.type.name}WhereInput`,
         ) as IntrospectionInputObjectType;
         const filterSome = type.inputFields.find(
-          t => t.name === `${parts[0]}_some`
+          t => t.name === `${parts[0]}_some`,
         );
 
         if (filterSome) {
           return {
             ...acc,
-            [`${parts[0]}_some`]: { id: params.filter[key] }
+            [`${parts[0]}_some`]: { id: params.filter[key] },
           };
         }
 
@@ -82,7 +82,7 @@ const buildGetListVariables = (introspectionResults: IntrospectionResult) => (
       }
 
       const resourceField = (resource.type as IntrospectionObjectType).fields.find(
-        f => f.name === parts[0]
+        f => f.name === parts[0],
       )!;
       if ((resourceField.type as IntrospectionNamedTypeRef).name === 'Int') {
         return { ...acc, [key]: parseInt(params.filter[key]) };
@@ -99,17 +99,17 @@ const buildGetListVariables = (introspectionResults: IntrospectionResult) => (
     skip: (params.pagination.page - 1) * params.pagination.perPage,
     first: params.pagination.perPage,
     orderBy: `${params.sort.field}_${params.sort.order}`,
-    where: filter
+    where: filter,
   };
 };
 
 const findInputFieldForType = (
   introspectionResults: IntrospectionResult,
   typeName: string,
-  field: string
+  field: string,
 ) => {
   const type = introspectionResults.types.find(
-    t => t.name === typeName
+    t => t.name === typeName,
   ) as IntrospectionInputObjectType;
 
   if (!type) {
@@ -125,7 +125,7 @@ const findInputFieldForType = (
 const inputFieldExistsForType = (
   introspectionResults: IntrospectionResult,
   typeName: string,
-  field: string
+  field: string,
 ): boolean => {
   return !!findInputFieldForType(introspectionResults, typeName, field);
 };
@@ -136,7 +136,7 @@ const buildReferenceField = (
     introspectionResults,
     typeName,
     field,
-    mutationType
+    mutationType,
   }: {
     inputArg: { [key: string]: any };
     introspectionResults: IntrospectionResult;
@@ -147,19 +147,19 @@ const buildReferenceField = (
   const inputType = findInputFieldForType(
     introspectionResults,
     typeName,
-    field
+    field,
   );
   const mutationInputType = findInputFieldForType(
     introspectionResults,
     inputType!.name,
-    mutationType
+    mutationType,
   );
 
   return Object.keys(inputArg).reduce((acc, key) => {
     return ((Object.keys(acc).length === 0) && inputFieldExistsForType(
       introspectionResults,
       mutationInputType!.name,
-      key
+      key,
     ))
       ? { ...acc, [key]: inputArg[key] }
       : acc;
@@ -175,7 +175,7 @@ interface UpdateParams {
 const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
   resource: Resource,
   aorFetchType: String,
-  params: UpdateParams
+  params: UpdateParams,
 ) => Object.keys(params.data).reduce(
   (acc, key) => {
     let data = params.data[key];
@@ -195,7 +195,7 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
       const inputType = findInputFieldForType(
         introspectionResults,
         `${resource.type.name}UpdateInput`,
-        key
+        key,
       );
 
       if (!inputType) {
@@ -208,7 +208,7 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
       const hasConnectMethod = findInputFieldForType(
         introspectionResults,
         inputType.name,
-        'connect'
+        'connect',
       );
       if (!hasConnectMethod) {
         return {
@@ -216,19 +216,19 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
           data: {
             ...acc.data,
             [key]: {
-              [PRISMA_SET]: data
-            }
-          }
+              [PRISMA_SET]: data,
+            },
+          },
         };
       }
 
       //if key connect already exist we dont do anything
       const {
         fieldsToAdd,
-        fieldsToRemove
+        fieldsToRemove,
       } = computeFieldsToAddRemoveUpdate(
         previousData,
-        data
+        data,
       );
       return {
         ...acc,
@@ -236,9 +236,9 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
           ...acc.data,
           [key]: {
             [PRISMA_CONNECT]: fieldsToAdd,
-            [PRISMA_DISCONNECT]: fieldsToRemove
-          }
-        }
+            [PRISMA_DISCONNECT]: fieldsToRemove,
+          },
+        },
       };
     }
 
@@ -249,7 +249,7 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
         introspectionResults,
         typeName: `${resource.type.name}UpdateInput`,
         field: key,
-        mutationType: PRISMA_CONNECT
+        mutationType: PRISMA_CONNECT,
       });
 
       console.log('fieldsToUpdate', fieldsToUpdate);
@@ -264,8 +264,8 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
         ...acc,
         data: {
           ...acc.data,
-          [key]: { [PRISMA_CONNECT]: { ...fieldsToUpdate } }
-        }
+          [key]: { [PRISMA_CONNECT]: { ...fieldsToUpdate } },
+        },
       };
     }
 
@@ -274,13 +274,13 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
       return {
         ...acc,
         where: {
-          id: data
-        }
+          id: data,
+        },
       };
     }
 
     const type = introspectionResults.types.find(
-      t => t.name === resource.type.name
+      t => t.name === resource.type.name,
     ) as IntrospectionObjectType;
 
     const isInField = type.fields.find(t => t.name === key);
@@ -292,14 +292,14 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
         ...acc,
         data: {
           ...acc.data,
-          [key]: data
-        }
+          [key]: data,
+        },
       };
     }
 
     return acc;
   },
-  {} as { [key: string]: any }
+  {} as { [key: string]: any },
 );
 
 interface CreateParams {
@@ -309,7 +309,7 @@ interface CreateParams {
 const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
   resource: Resource,
   aorFetchType: string,
-  params: CreateParams
+  params: CreateParams,
 ) =>
   Object.keys(params.data).reduce(
     (acc, key) => {
@@ -339,7 +339,7 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
         const inputType = findInputFieldForType(
           introspectionResults,
           `${resource.type.name}CreateInput`,
-          key
+          key,
         );
         if (!inputType) {
           return acc;
@@ -351,7 +351,7 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
         const hasSetMethod = findInputFieldForType(
           introspectionResults,
           inputType.name,
-          'set'
+          'set',
         );
 
         if (hasSetMethod) {
@@ -360,9 +360,9 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
             data: {
               ...acc.data,
               [key]: {
-                [PRISMA_SET]: data
-              }
-            }
+                [PRISMA_SET]: data,
+              },
+            },
           };
         }
 
@@ -371,9 +371,9 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
           data: {
             ...acc.data,
             [key]: {
-              [PRISMA_CONNECT]: data
-            }
-          }
+              [PRISMA_CONNECT]: data,
+            },
+          },
         };
       }
 
@@ -383,7 +383,7 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
           introspectionResults,
           typeName: `${resource.type.name}CreateInput`,
           field: key,
-          mutationType: PRISMA_CONNECT
+          mutationType: PRISMA_CONNECT,
         });
         // If no fields in the object are valid, continue
         if (Object.keys(fieldsToConnect).length === 0) {
@@ -395,8 +395,8 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
           ...acc,
           data: {
             ...acc.data,
-            [key]: { [PRISMA_CONNECT]: { ...fieldsToConnect } }
-          }
+            [key]: { [PRISMA_CONNECT]: { ...fieldsToConnect } },
+          },
         };
       }
 
@@ -405,13 +405,13 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
         return {
           ...acc,
           where: {
-            id: params.data[key]
-          }
+            id: params.data[key],
+          },
         };
       }
 
       const type = introspectionResults.types.find(
-        t => t.name === resource.type.name
+        t => t.name === resource.type.name,
       ) as IntrospectionObjectType;
       const isInField = type.fields.find(t => t.name === key);
 
@@ -421,49 +421,49 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
           ...acc,
           data: {
             ...acc.data,
-            [key]: data
-          }
+            [key]: data,
+          },
         };
       }
 
       return acc;
     },
-    {} as { [key: string]: any }
+    {} as { [key: string]: any },
   );
 
 export default (introspectionResults: IntrospectionResult) => (
   resource: Resource,
   aorFetchType: string,
-  params: any
+  params: any,
 ) => {
   switch (aorFetchType) {
     case GET_LIST: {
       return buildGetListVariables(introspectionResults)(
         resource,
         aorFetchType,
-        params
+        params,
       );
     }
     case GET_MANY:
       return {
-        where: { id_in: params.ids }
+        where: { id_in: params.ids },
       };
     case GET_MANY_REFERENCE: {
       const parts = params.target.split('.');
 
       return {
-        where: { [parts[0]]: { id: params.id } }
+        where: { [parts[0]]: { id: params.id } },
       };
     }
     case GET_ONE:
       return {
-        where: { id: params.id }
+        where: { id: params.id },
       };
     case UPDATE: {
       const variables = buildUpdateVariables(introspectionResults)(
         resource,
         aorFetchType,
-        params
+        params,
       );
       return variables;
     }
@@ -472,13 +472,13 @@ export default (introspectionResults: IntrospectionResult) => (
       return buildCreateVariables(introspectionResults)(
         resource,
         aorFetchType,
-        params
+        params,
       );
     }
 
     case DELETE:
       return {
-        where: { id: params.id }
+        where: { id: params.id },
       };
   }
 };

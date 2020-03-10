@@ -6,7 +6,7 @@ import getFinalType from './utils/getFinalType';
 const sanitizeResource = (
   introspectionResults: IntrospectionResult,
   resource: Resource,
-  fieldAliasResolver?: Function
+  fieldAliasResolver?: Function,
 ) => (data: { [key: string]: any }): any => {
   return Object.keys(data).reduce((acc, key) => {
     if (key.startsWith('_')) {
@@ -16,21 +16,21 @@ const sanitizeResource = (
     let field: IntrospectionField | undefined = (resource.type as IntrospectionObjectType).fields.find(
       field => {
         return field.name === key; // Aliased fields won't be found through such simple comparison (ie: myTitle: title)
-      }
+      },
     );
     if (typeof field === 'undefined' && fieldAliasResolver) {
       // The field wasn't resolved, it's likely an alias, try to resolve alias
       const fieldAlias: IntrospectionField | undefined = (resource.type as IntrospectionObjectType).fields.find(
         field => {
           return field.name === fieldAliasResolver(field, key, acc, introspectionResults);
-        }
+        },
       );
 
       // If alias is found, copy alias property but keep the actual field name
       if (fieldAlias) {
         field = {
           ...fieldAlias,
-          name: key
+          name: key,
         };
       }
     }
@@ -47,7 +47,7 @@ const sanitizeResource = (
 
     // FIXME: We might have to handle linked types which are not resources but will have to be careful about endless circular dependencies
     const linkedResource = introspectionResults.resources.find(
-      r => r.type.name === type.name
+      r => r.type.name === type.name,
     );
 
     if (linkedResource) {
@@ -57,11 +57,11 @@ const sanitizeResource = (
         return {
           ...acc,
           [field.name]: data[field.name].map(
-            sanitizeResource(introspectionResults, linkedResource)
+            sanitizeResource(introspectionResults, linkedResource),
           ),
           [`${field.name}Ids`]: data[field.name].map(
-            (d: { id: string }) => d.id
-          )
+            (d: { id: string }) => d.id,
+          ),
         };
       }
 
@@ -72,9 +72,9 @@ const sanitizeResource = (
           : undefined,
         [field.name]: linkedResourceData
           ? sanitizeResource(introspectionResults, linkedResource)(
-            data[field.name]
+            data[field.name],
           )
-          : undefined
+          : undefined,
       };
     }
 
@@ -84,7 +84,7 @@ const sanitizeResource = (
 
 export default (introspectionResults: IntrospectionResult, fieldAliasResolver?: Function) => (
   aorFetchType: string,
-  resource: Resource
+  resource: Resource,
 ) => (response: { [key: string]: any }) => {
   const sanitize = sanitizeResource(introspectionResults, resource, fieldAliasResolver);
   const data = response.data;
@@ -96,7 +96,7 @@ export default (introspectionResults: IntrospectionResult, fieldAliasResolver?: 
   ) {
     return {
       data: response.data.items.map(sanitize),
-      total: response.data.total.aggregate.count
+      total: response.data.total.aggregate.count,
     };
   }
 
