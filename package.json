@@ -2,6 +2,23 @@
   "name": "@unly/ra-data-graphql-prisma",
   "version": "0.0.10",
   "description": "A react-admin data provider for Prisma Server",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "clean": "rm -rf lib/",
+    "lint": "esw src/ --fix --watch",
+    "lint:once": "eslint src/ --fix",
+    "preversion": "yarn lint:once && yarn test:once && yarn doc:toc && yarn run doc:api",
+    "postversion": "git push && git push --tags",
+    "prepublishOnly": "yarn clean && yarn build:once && yarn publish:preview && cli-confirm \"Do you really want to release a new version? Please check the files that will be publicly released first. (y/n)\"",
+    "publish:preview": "npm pack && tar -xvzf *.tgz && rm -rf package *.tgz",
+    "release": "yarn bump --prompt --commit --tag --push",
+    "releaseAndPublish": "yarn release && npm publish",
+    "doc:toc": "yarn markdown-toc --maxdepth 4 -i README.md",
+    "test": "NODE_ENV=test jest --watch",
+    "test:once": "NODE_ENV=test jest",
+    "test:coverage": "NODE_ENV=test jest --coverage"
+  },
   "main": "dist/index.js",
   "sideEffects": false,
   "repository": {
@@ -14,7 +31,8 @@
   "homepage": "https://github.com/UnlyEd/ra-data-graphql-prisma#readme",
   "authors": [
     "Flavian DESVERNE",
-    "Marc-Antoine FONNE"
+    "Marc-Antoine FONNE",
+    "unlyEd"
   ],
   "keywords": [
     "reactjs",
@@ -27,35 +45,50 @@
     "graphcms"
   ],
   "license": "MIT",
-  "scripts": {
-    "build": "tsc",
-    "watch": "tsc --watch"
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
+  "files": [
+    "/dist"
+  ],
+  "jest": {
+    "setupFilesAfterEnv": [
+      "jest-extended"
+    ],
+    "verbose": true
   },
   "dependencies": {
-    "graphql-tag": "^2.6.1",
-    "lodash": "~4.17.5",
-    "pluralize": "^7.0.0",
-    "ra-data-graphql": "^2.3.0"
-  },
-  "peerDependencies": {
-    "graphql": "^0.13.2",
-    "react-admin": "^2.3.0"
+    "graphql-tag": "2.9.2",
+    "lodash": "4.17.10",
+    "pluralize": "7.0.0",
+    "ra-data-graphql": "2.3.0"
   },
   "devDependencies": {
-    "@types/jest": "^23.3.2",
-    "@types/lodash": "^4.14.116",
-    "@types/pluralize": "^0.0.29",
-    "apollo-client": "^2.4.2",
-    "babel-cli": "~6.26.0",
-    "babel-plugin-transform-object-rest-spread": "^6.23.0",
-    "babel-preset-env": "^1.7.0",
-    "cross-env": "^5.2.0",
-    "graphql": "^14.3.1",
-    "jest": "^23.6.0",
-    "react": "^16.8.6",
-    "react-admin": "^2.3.0",
-    "react-dom": "^16.8.6",
-    "rimraf": "^2.6.2",
-    "typescript": "^3.0.3"
+    "@types/jest": "23.3.2",
+    "@types/lodash": "4.14.116",
+    "@types/pluralize": "0.0.29",
+    "@unly/cli-confirm": "1.1.1",
+    "apollo-client": "2.4.2",
+    "babel-cli": "6.26.0",
+    "babel-plugin-transform-object-rest-spread": "6.26.0",
+    "babel-preset-env": "1.7.0",
+    "cross-env": "5.2.0",
+    "eslint-watch": "6.0.1",
+    "graphql": "14.3.1",
+    "jest": "25.1.0",
+    "jest-extended": "0.11.5",
+    "markdown-toc": "1.2.0",
+    "react": "16.8.6",
+    "react-admin": "2.3.0",
+    "react-dom": "16.8.6",
+    "rimraf": "2.6.2",
+    "ts-jest": "25.2.1",
+    "typescript": "3.0.3",
+    "version-bump-prompt": "6.0.2"
+  },
+  "peerDependencies": {
+    "graphql": "0.13.2",
+    "react-admin": "2.3.0"
   }
 }
