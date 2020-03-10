@@ -249,7 +249,7 @@ describe('buildGqlQuery', () => {
   };
   const params = { foo: 'foo_value' };
 
-  it('returns the correct query for GET_LIST', () => {
+  it.skip('returns the correct query for GET_LIST', () => {
     expect(
       print(
         buildGqlQuery(introspectionResults as IntrospectionResult)(
@@ -280,7 +280,7 @@ describe('buildGqlQuery', () => {
 `
     );
   });
-  it('returns the correct query for GET_MANY', () => {
+  it.skip('returns the correct query for GET_MANY', () => {
     expect(
       print(
         buildGqlQuery(introspectionResults as IntrospectionResult)(
@@ -311,7 +311,7 @@ describe('buildGqlQuery', () => {
 `
     );
   });
-  it('returns the correct query for GET_MANY_REFERENCE', () => {
+  it.skip('returns the correct query for GET_MANY_REFERENCE', () => {
     expect(
       print(
         buildGqlQuery(introspectionResults as IntrospectionResult)(
@@ -342,7 +342,7 @@ describe('buildGqlQuery', () => {
 `
     );
   });
-  it('returns the correct query for GET_ONE', () => {
+  it.skip('returns the correct query for GET_ONE', () => {
     expect(
       print(
         buildGqlQuery(introspectionResults as IntrospectionResult)(
@@ -368,7 +368,7 @@ describe('buildGqlQuery', () => {
 `
     );
   });
-  it('returns the correct query for UPDATE', () => {
+  it.skip('returns the correct query for UPDATE', () => {
     expect(
       print(
         buildGqlQuery(introspectionResults as IntrospectionResult)(
@@ -394,7 +394,7 @@ describe('buildGqlQuery', () => {
 `
     );
   });
-  it('returns the correct query for CREATE', () => {
+  it.skip('returns the correct query for CREATE', () => {
     expect(
       print(
         buildGqlQuery(introspectionResults as IntrospectionResult)(
@@ -420,7 +420,7 @@ describe('buildGqlQuery', () => {
 `
     );
   });
-  it('returns the correct query for DELETE', () => {
+  it.skip('returns the correct query for DELETE', () => {
     expect(
       print(
         buildGqlQuery(introspectionResults as IntrospectionResult)(
