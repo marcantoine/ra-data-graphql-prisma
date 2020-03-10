@@ -39,7 +39,7 @@ export const buildFields = (introspectionResults: IntrospectionResult) => (
       }
 
       const linkedResource = introspectionResults.resources.find(
-        r => r.type.name === type.name,
+        (r) => r.type.name === type.name,
       );
 
       if (linkedResource) {
@@ -54,7 +54,7 @@ export const buildFields = (introspectionResults: IntrospectionResult) => (
       }
 
       const linkedType = introspectionResults.types.find(
-        t => t.name === type.name,
+        (t) => t.name === type.name,
       );
 
       if (linkedType) {
@@ -109,10 +109,10 @@ export const buildArgs = (
   }
 
   const validVariables = Object.keys(variables).filter(
-    k => typeof variables[k] !== 'undefined',
+    (k) => typeof variables[k] !== 'undefined',
   );
   return query.args
-    .filter(arg => validVariables.includes(arg.name))
+    .filter((arg) => validVariables.includes(arg.name))
     .reduce(
       (acc: ArgumentNode[], arg) => [
         ...acc,
@@ -134,11 +134,11 @@ export const buildApolloArgs = (
   }
 
   const validVariables = Object.keys(variables).filter(
-    k => typeof variables[k] !== 'undefined',
+    (k) => typeof variables[k] !== 'undefined',
   );
 
   return query.args
-    .filter(arg => validVariables.includes(arg.name))
+    .filter((arg) => validVariables.includes(arg.name))
     .reduce(
       (acc: VariableDefinitionNode[], arg) => [
         ...acc,

@@ -9,7 +9,7 @@ export const buildQueryFactory = () => (
   introspectionResults: IntrospectionResult,
   fieldAliasResolver?: Function,
 ) => {
-  const knownResources = introspectionResults.resources.map(r => r.type.name);
+  const knownResources = introspectionResults.resources.map((r) => r.type.name);
 
   return (
     aorFetchType: string,
@@ -18,7 +18,7 @@ export const buildQueryFactory = () => (
     fragment: DocumentNode,
   ) => {
     const resource = introspectionResults.resources.find(
-      r => r.type.name === resourceName,
+      (r) => r.type.name === resourceName,
     );
 
     if (!resource) {

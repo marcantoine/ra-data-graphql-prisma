@@ -14,14 +14,14 @@ const sanitizeResource = (
     }
 
     let field: IntrospectionField | undefined = (resource.type as IntrospectionObjectType).fields.find(
-      field => {
+      (field) => {
         return field.name === key; // Aliased fields won't be found through such simple comparison (ie: myTitle: title)
       },
     );
     if (typeof field === 'undefined' && fieldAliasResolver) {
       // The field wasn't resolved, it's likely an alias, try to resolve alias
       const fieldAlias: IntrospectionField | undefined = (resource.type as IntrospectionObjectType).fields.find(
-        field => {
+        (field) => {
           return field.name === fieldAliasResolver(field, key, acc, introspectionResults);
         },
       );
@@ -47,7 +47,7 @@ const sanitizeResource = (
 
     // FIXME: We might have to handle linked types which are not resources but will have to be careful about endless circular dependencies
     const linkedResource = introspectionResults.resources.find(
-      r => r.type.name === type.name,
+      (r) => r.type.name === type.name,
     );
 
     if (linkedResource) {

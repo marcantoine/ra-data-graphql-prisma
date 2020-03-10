@@ -2,7 +2,9 @@ import { ApolloClient, ApolloClientOptions } from 'apollo-client';
 import camelCase from 'lodash/camelCase';
 import merge from 'lodash/merge';
 import pluralize from 'pluralize';
-import { CREATE, DELETE, DELETE_MANY, GET_LIST, GET_MANY, GET_MANY_REFERENCE, GET_ONE, UPDATE, UPDATE_MANY } from 'ra-core';
+import {
+  CREATE, DELETE, DELETE_MANY, GET_LIST, GET_MANY, GET_MANY_REFERENCE, GET_ONE, UPDATE, UPDATE_MANY 
+} from 'ra-core';
 
 import buildDataProvider, { GraphQLDataProvider } from 'ra-data-graphql';
 
@@ -54,7 +56,7 @@ export default (options: {
                 ...otherParams,
               }),
             ),
-          ).then(results => {
+          ).then((results) => {
             return { data: results.map(({ data }: any) => data.id) };
           });
         }
@@ -68,7 +70,7 @@ export default (options: {
                 ...otherParams,
               }),
             ),
-          ).then(results => {
+          ).then((results) => {
             return { data: results.map(({ data }: any) => data.id) };
           });
         }
