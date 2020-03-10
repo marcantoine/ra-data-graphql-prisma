@@ -105,8 +105,10 @@ const testListTypes = (type: string) => {
     };
 
     expect(
+      // @ts-ignore
       getResponseParser(introspectionResults as IntrospectionResult)(
         type,
+        // @ts-ignore
         resource as Resource,
       )(response),
     ).toEqual({
@@ -227,8 +229,10 @@ const testSingleTypes = (type: string) => {
       },
     };
     expect(
+      // @ts-ignore
       getResponseParser(introspectionResults as IntrospectionResult)(
         type,
+        // @ts-ignore
         resource as Resource,
       )(response),
     ).toEqual({

@@ -27,6 +27,7 @@ describe('buildVariables', () => {
       };
 
       expect(
+        // @ts-ignore
         buildVariables(introspectionResult as IntrospectionResult)(
           { type: { name: 'Post' } } as Resource,
           GET_LIST,
@@ -272,6 +273,7 @@ describe('buildVariables', () => {
       };
 
       expect(
+        // @ts-ignore
         buildVariables(introspectionResult as IntrospectionResult)(
           { type: { name: 'Post' } } as Resource,
           CREATE,
@@ -537,6 +539,7 @@ describe('buildVariables', () => {
       };
 
       expect(
+        // @ts-ignore
         buildVariables(introspectionResult as IntrospectionResult)(
           { type: { name: 'Post' } } as Resource,
           UPDATE,

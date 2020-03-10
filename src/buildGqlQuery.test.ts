@@ -68,6 +68,7 @@ describe('buildArgs', () => {
   it('returns an array of args correctly filtered when query has arguments', () => {
     expect(
       print(
+        // @ts-ignore
         buildArgs({ args: [{ name: 'foo' }, { name: 'bar' }] } as Query, {
           foo: 'foo_value',
         }),
@@ -78,12 +79,14 @@ describe('buildArgs', () => {
 
 describe('buildApolloArgs', () => {
   it('returns an empty array when query does not have any arguments', () => {
+    // @ts-ignore
     expect(print(buildApolloArgs({ args: [] }))).toEqual([]);
   });
 
   it('returns an array of args correctly filtered when query has arguments', () => {
     expect(
       print(
+        // @ts-ignore
         buildApolloArgs(
           {
             args: [
@@ -159,6 +162,7 @@ describe('buildFields', () => {
 
     expect(
       print(
+        // @ts-ignore
         buildFields(introspectionResults as IntrospectionResult)(fields as any),
       ),
     ).toEqual([
@@ -232,7 +236,9 @@ describe('buildGqlQuery', () => {
   it.skip('returns the correct query for GET_LIST', () => {
     expect(
       print(
+        // @ts-ignore
         buildGqlQuery(introspectionResults as IntrospectionResult)(
+          // @ts-ignore
           resource as Resource,
           GET_LIST,
           queryType as Query,
@@ -263,7 +269,9 @@ describe('buildGqlQuery', () => {
   it.skip('returns the correct query for GET_MANY', () => {
     expect(
       print(
+        // @ts-ignore
         buildGqlQuery(introspectionResults as IntrospectionResult)(
+          // @ts-ignore
           resource as Resource,
           GET_MANY,
           queryType as Query,
@@ -294,7 +302,9 @@ describe('buildGqlQuery', () => {
   it.skip('returns the correct query for GET_MANY_REFERENCE', () => {
     expect(
       print(
+        // @ts-ignore
         buildGqlQuery(introspectionResults as IntrospectionResult)(
+          // @ts-ignore
           resource as Resource,
           GET_MANY_REFERENCE,
           queryType as Query,
@@ -325,7 +335,9 @@ describe('buildGqlQuery', () => {
   it.skip('returns the correct query for GET_ONE', () => {
     expect(
       print(
+        // @ts-ignore
         buildGqlQuery(introspectionResults as IntrospectionResult)(
+          // @ts-ignore
           resource as Resource,
           GET_ONE,
           { ...queryType, name: 'getCommand' } as Query,
@@ -351,7 +363,9 @@ describe('buildGqlQuery', () => {
   it.skip('returns the correct query for UPDATE', () => {
     expect(
       print(
+        // @ts-ignore
         buildGqlQuery(introspectionResults as IntrospectionResult)(
+          // @ts-ignore
           resource as Resource,
           UPDATE,
           { ...queryType, name: 'updateCommand' } as Query,
@@ -377,7 +391,9 @@ describe('buildGqlQuery', () => {
   it.skip('returns the correct query for CREATE', () => {
     expect(
       print(
+        // @ts-ignore
         buildGqlQuery(introspectionResults as IntrospectionResult)(
+          // @ts-ignore
           resource as Resource,
           CREATE,
           { ...queryType, name: 'createCommand' } as Query,
@@ -403,7 +419,9 @@ describe('buildGqlQuery', () => {
   it.skip('returns the correct query for DELETE', () => {
     expect(
       print(
+        // @ts-ignore
         buildGqlQuery(introspectionResults as IntrospectionResult)(
+          // @ts-ignore
           resource as Resource,
           DELETE,
           { ...queryType, name: 'deleteCommand' } as Query,
