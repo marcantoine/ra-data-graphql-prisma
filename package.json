@@ -3,8 +3,8 @@
   "version": "1.0.0-beta.1",
   "description": "A react-admin data provider for Prisma Server",
   "scripts": {
-    "build": "tsc",
-    "watch": "tsc --watch",
+    "start": "tsc --watch",
+    "build:once": "tsc",
     "clean": "rm -rf lib/",
     "lint": "esw src --ext .ts --watch",
     "lint:once": "eslint src --ext .ts",
