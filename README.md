@@ -1,3 +1,7 @@
+[![Maintainability](https://api.codeclimate.com/v1/badges/f86e68cb7b3976d0e2ab/maintainability)](https://codeclimate.com/github/UnlyEd/ra-data-graphql-prisma/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/f86e68cb7b3976d0e2ab/test_coverage)](https://codeclimate.com/github/UnlyEd/ra-data-graphql-prisma/test_coverage)
+[![Build Status](https://travis-ci.com/UnlyEd/ra-data-graphql-prisma.svg?branch=master)](https://travis-ci.com/UnlyEd/ra-data-graphql-prisma)
+
 # @unly/ra-data-graphql-prisma
 
 `react-admin` data provider for Prisma
