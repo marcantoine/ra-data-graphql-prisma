@@ -7,10 +7,9 @@
     "isolatedModules": false,
     "lib": [
       "dom",
-      "dom.iterable",
-      "es2017"
+      "esnext"
     ],
-    "target": "es2018",
+    "target": "es5",
     "module": "commonjs",
     "moduleResolution": "node",
     "noEmit": false,
