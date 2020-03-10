@@ -22,11 +22,7 @@
     "declaration": true,
     "outDir": "lib",
     "strict": true,
-    "removeComments": true,
-    "typeRoots": [
-      "node_modules/@types",
-      "src/typings"
-    ]
+    "removeComments": true
   },
   "include": [
     "src/**/*"
