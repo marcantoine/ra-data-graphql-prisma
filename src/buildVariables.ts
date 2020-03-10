@@ -1,31 +1,13 @@
-import {
-  GET_LIST,
-  GET_ONE,
-  GET_MANY,
-  GET_MANY_REFERENCE,
-  CREATE,
-  UPDATE,
-  DELETE
-} from 'react-admin';
-import isObject from 'lodash/isObject';
+import { IntrospectionInputObjectType, IntrospectionNamedTypeRef, IntrospectionObjectType } from 'graphql';
 import isDate from 'lodash/isDate';
+import isObject from 'lodash/isObject';
+import { CREATE, DELETE, GET_LIST, GET_MANY, GET_MANY_REFERENCE, GET_ONE, UPDATE } from 'ra-core';
+import { IntrospectionResult, Resource } from './constants/interfaces';
 
-import getFinalType from './utils/getFinalType';
+import { PRISMA_CONNECT, PRISMA_DISCONNECT, PRISMA_SET } from './constants/mutations';
 import { computeFieldsToAddRemoveUpdate } from './utils/computeAddRemoveUpdate';
 
-import {
-  PRISMA_SET,
-  PRISMA_CONNECT,
-  PRISMA_DISCONNECT,
-  PRISMA_UPDATE
-} from './constants/mutations';
-import {
-  IntrospectionInputObjectType,
-  IntrospectionObjectType,
-  IntrospectionType,
-  IntrospectionNamedTypeRef
-} from 'graphql';
-import { IntrospectionResult, Resource } from './constants/interfaces';
+import getFinalType from './utils/getFinalType';
 
 interface GetListParams {
   filter: { [key: string]: any };
@@ -113,7 +95,6 @@ const buildGetListVariables = (introspectionResults: IntrospectionResult) => (
     return { ...acc, [key]: params.filter[key] };
   }, {});
 
-
   return {
     skip: (params.pagination.page - 1) * params.pagination.perPage,
     first: params.pagination.perPage,
@@ -149,19 +130,20 @@ const inputFieldExistsForType = (
   return !!findInputFieldForType(introspectionResults, typeName, field);
 };
 
-const buildReferenceField = ({
-  inputArg,
-  introspectionResults,
-  typeName,
-  field,
-  mutationType
-}: {
-  inputArg: { [key: string]: any };
-  introspectionResults: IntrospectionResult;
-  typeName: string;
-  field: string;
-  mutationType: string;
-}) => {
+const buildReferenceField = (
+  {
+    inputArg,
+    introspectionResults,
+    typeName,
+    field,
+    mutationType
+  }: {
+    inputArg: { [key: string]: any };
+    introspectionResults: IntrospectionResult;
+    typeName: string;
+    field: string;
+    mutationType: string;
+  }) => {
   const inputType = findInputFieldForType(
     introspectionResults,
     typeName,
@@ -196,17 +178,17 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
   params: UpdateParams
 ) => Object.keys(params.data).reduce(
   (acc, key) => {
-    let data = params.data[key]
-    let previousData = params.previousData[key]
+    let data = params.data[key];
+    let previousData = params.previousData[key];
     if (Array.isArray(data)) {
 
       // if key finish with Ids, its an array of relation
       if (/Ids$/.test(key)) {
-        previousData = params.previousData[key].map((id: string) => ({ id }))
+        previousData = params.previousData[key].map((id: string) => ({ id }));
         //we remove Ids form field
-        key = key.replace(/Ids$/, '')
+        key = key.replace(/Ids$/, '');
         //and put id in the array
-        data = data.map((id: string) => ({ id }))
+        data = data.map((id: string) => ({ id }));
 
       }
 
@@ -270,6 +252,8 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
         mutationType: PRISMA_CONNECT
       });
 
+      console.log('fieldsToUpdate', fieldsToUpdate);
+
       // If no fields in the object are valid, continue
       if (Object.keys(fieldsToUpdate).length === 0) {
         return acc;
@@ -295,13 +279,11 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
       };
     }
 
-
     const type = introspectionResults.types.find(
       t => t.name === resource.type.name
     ) as IntrospectionObjectType;
 
     const isInField = type.fields.find(t => t.name === key);
-
 
     if (!!isInField) {
       // Rest should be put in data object
@@ -331,27 +313,27 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
 ) =>
   Object.keys(params.data).reduce(
     (acc, key) => {
-      let data = params.data[key]
+      let data = params.data[key];
       if (Array.isArray(data)) {
 
         // if key finish with Ids, its an array of relation
         if (/Ids$/.test(key)) {
           //we remove Ids form field
-          key = key.replace(/Ids$/, '')
+          key = key.replace(/Ids$/, '');
           //and put id in the array
-          data = data.map((id: string) => ({ id }))
+          data = data.map((id: string) => ({ id }));
         }
 
-        let entryIsObject = data.some((entry: any) => isObject(entry) && !isDate(entry))
+        let entryIsObject = data.some((entry: any) => isObject(entry) && !isDate(entry));
 
         if (entryIsObject) {
           data = data.map((entry: any) => Object.keys(entry)
             .reduce((obj: any, key: any) => {
               if (key === 'id') {
-                obj[key] = entry[key]
+                obj[key] = entry[key];
               }
               return obj;
-            }, {}))
+            }, {}));
         }
 
         const inputType = findInputFieldForType(
@@ -362,7 +344,6 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
         if (!inputType) {
           return acc;
         }
-
 
         // if its an array, it can be an array of relation or an array of Scalar
         // we check the corresponding input in introspectionresult to know if it use "set" or something else
@@ -418,7 +399,6 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
           }
         };
       }
-
 
       // Put id field in a where object
       if (key === 'id' && params.data[key]) {
@@ -485,7 +465,7 @@ export default (introspectionResults: IntrospectionResult) => (
         aorFetchType,
         params
       );
-      return variables
+      return variables;
     }
 
     case CREATE: {

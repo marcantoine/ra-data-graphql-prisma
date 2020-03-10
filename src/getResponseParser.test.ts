@@ -1,14 +1,7 @@
 import { TypeKind } from 'graphql';
-import {
-  GET_LIST,
-  GET_MANY,
-  GET_MANY_REFERENCE,
-  CREATE,
-  UPDATE,
-  DELETE
-} from 'react-admin';
-import getResponseParser from './getResponseParser';
+import { CREATE, DELETE, GET_LIST, GET_MANY, GET_MANY_REFERENCE, UPDATE } from 'ra-core';
 import { IntrospectionResult, Resource } from './constants/interfaces';
+import getResponseParser from './getResponseParser';
 
 const testListTypes = (type: string) => {
   it('returns the response expected by RA for GET_LIST', () => {

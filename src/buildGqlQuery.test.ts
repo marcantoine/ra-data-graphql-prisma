@@ -1,26 +1,6 @@
-import {
-  TypeKind,
-  print,
-  IntrospectionField,
-  FieldNode,
-  DocumentNode
-} from 'graphql';
-import {
-  GET_LIST,
-  GET_ONE,
-  GET_MANY,
-  GET_MANY_REFERENCE,
-  UPDATE,
-  CREATE,
-  DELETE
-} from 'react-admin';
-import buildGqlQuery, {
-  buildApolloArgs,
-  buildArgs,
-  buildFields,
-  getArgType,
-  Query
-} from './buildGqlQuery';
+import { DocumentNode, IntrospectionField, print, TypeKind } from 'graphql';
+import { CREATE, DELETE, GET_LIST, GET_MANY, GET_MANY_REFERENCE, GET_ONE, UPDATE } from 'ra-core';
+import buildGqlQuery, { buildApolloArgs, buildArgs, buildFields, getArgType, Query } from './buildGqlQuery';
 import { IntrospectionResult, Resource } from './constants/interfaces';
 
 describe('getArgType', () => {

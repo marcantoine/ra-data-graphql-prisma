@@ -1,8 +1,9 @@
-import buildVariables from './buildVariables';
-import buildGqlQuery, { Query } from './buildGqlQuery';
-import getResponseParser from './getResponseParser';
-import { IntrospectionResult } from './constants/interfaces';
 import { DocumentNode } from 'graphql';
+
+import buildGqlQuery, { Query } from './buildGqlQuery';
+import buildVariables from './buildVariables';
+import { IntrospectionResult } from './constants/interfaces';
+import getResponseParser from './getResponseParser';
 
 export const buildQueryFactory = () => (
   introspectionResults: IntrospectionResult,
@@ -31,9 +32,7 @@ export const buildQueryFactory = () => (
 
     if (!queryType) {
       throw new Error(
-        `No query or mutation matching aor fetch type ${aorFetchType} could be found for resource ${
-        resource.type.name
-        }`
+        `No query or mutation matching aor fetch type ${aorFetchType} could be found for resource ${resource.type.name}`
       );
     }
     const variables = buildVariables(introspectionResults)(

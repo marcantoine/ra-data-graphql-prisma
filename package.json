@@ -3,26 +3,28 @@
   "version": "1.0.0-beta.2",
   "description": "A react-admin data provider for Prisma Server",
   "scripts": {
-    "start": "tsc --watch",
-    "build:once": "tsc",
+    "start": "cross-env-shell 'concurrently -p '{name}' -n 'lint,build,test' -c 'gray.bgWhite,yellow.bgBlue,green.bgWhite' \"yarn lint\" \"yarn build\" \"yarn test\"'",
+    "build": "yarn clean && tsc -w",
+    "build:once": "yarn clean && tsc",
     "clean": "rm -rf lib/",
-    "lint": "esw src --ext .ts --watch",
-    "lint:once": "eslint src --ext .ts",
-    "lint:fix": "eslint src --ext .ts --fix",
-    "lint:fix:preview": "eslint src --ext .ts --fix-dry-run",
-    "preversion": "yarn test:once && yarn doc:toc",
-    "postversion": "git push && git push --tags",
+    "lint": "esw src -w --ext .ts --ext .tsx",
+    "lint:once": "eslint src --ext .ts --ext .tsx",
+    "lint:fix": "eslint src --ext .ts --ext .tsx --fix",
+    "lint:fix:preview": "eslint src --ext .ts --ext .tsx --fix-dry-run",
+    "preversion": "yarn lint:once && yarn test:once && yarn doc:toc",
+    "postversion": "git add README.md CHANGELOG.md && git commit --amend --no-edit && git push && git push --tags",
     "prepublishOnly": "yarn clean && yarn build:once && yarn publish:preview && cli-confirm \"Do you really want to release a new version? Please check the files that will be publicly released first. (y/n)\"",
     "publish:preview": "npm pack && tar -xvzf *.tgz && rm -rf package *.tgz",
-    "release": "yarn bump --commit --tag --push",
+    "release": "yarn bump --commit --tag",
     "releaseAndPublish": "yarn release && npm publish",
     "doc:toc": "yarn markdown-toc --maxdepth 4 -i README.md",
-    "test": "NODE_ENV=test jest --watch",
+    "test": "NODE_ENV=test jest --watchAll",
     "test:once": "NODE_ENV=test jest",
-    "test:coverage": "NODE_ENV=test jest --coverage"
+    "test:coverage": "NODE_ENV=test jest --coverage",
+    "security:audit": "yarn audit",
+    "packages:upgrade": "yarn upgrade-interactive --latest"
   },
-  "main": "dist/index.js",
-  "sideEffects": false,
+  "main": "lib/index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/UnlyEd/ra-data-graphql-prisma.git"
@@ -52,7 +54,7 @@
     "access": "public"
   },
   "files": [
-    "/dist"
+    "/lib"
   ],
   "jest": {
     "setupFilesAfterEnv": [
@@ -61,41 +63,42 @@
     "verbose": true
   },
   "dependencies": {
-    "graphql-tag": "2.9.2",
-    "lodash": "4.17.10",
-    "pluralize": "7.0.0",
-    "ra-data-graphql": "2.3.0"
+    "graphql-tag": "2.10.3",
+    "lodash": "4.17.15",
+    "pluralize": "8.0.0",
+    "ra-core": "3.3.0",
+    "ra-data-graphql": "3.2.2"
   },
   "devDependencies": {
-    "@types/jest": "23.3.2",
-    "@types/lodash": "4.14.116",
+    "@babel/core": "7.8.7",
+    "@babel/preset-env": "7.8.7",
+    "@babel/preset-typescript": "7.8.3",
+    "@types/jest": "25.1.4",
+    "@types/lodash": "4.14.149",
+    "@types/node": "13.9.0",
     "@types/pluralize": "0.0.29",
     "@typescript-eslint/eslint-plugin": "2.23.0",
     "@typescript-eslint/parser": "2.23.0",
     "@unly/cli-confirm": "1.1.1",
-    "apollo-client": "2.4.2",
+    "apollo-client": "2.6.8",
     "babel-cli": "6.26.0",
+    "babel-jest": "25.1.0",
     "babel-plugin-transform-object-rest-spread": "6.26.0",
     "babel-preset-env": "1.7.0",
-    "cross-env": "5.2.0",
+    "concurrently": "5.1.0",
+    "cross-env": "7.0.2",
     "eslint": "6.8.0",
+    "eslint-plugin-import": "2.20.1",
     "eslint-plugin-jest": "23.8.2",
     "eslint-plugin-jsx-a11y": "6.2.3",
     "eslint-watch": "6.0.1",
-    "graphql": "14.3.1",
+    "graphql": "14.6.0",
     "jest": "25.1.0",
     "jest-extended": "0.11.5",
     "markdown-toc": "1.2.0",
-    "react": "16.8.6",
-    "react-admin": "2.3.0",
-    "react-dom": "16.8.6",
     "rimraf": "2.6.2",
     "ts-jest": "25.2.1",
-    "typescript": "3.0.3",
+    "typescript": "3.8.3",
     "version-bump-prompt": "6.0.2"
-  },
-  "peerDependencies": {
-    "graphql": "0.13.2",
-    "react-admin": "2.3.0"
   }
 }

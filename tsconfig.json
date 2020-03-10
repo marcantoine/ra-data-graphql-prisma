@@ -1,38 +1,35 @@
 {
   "compilerOptions": {
-    "allowJs": true,
+    "allowJs": false,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "jsx": "preserve",
+    "isolatedModules": false,
     "lib": [
       "dom",
       "dom.iterable",
-      "esnext"
+      "es2017"
     ],
+    "target": "es2018",
     "module": "commonjs",
-    "outDir": "./dist" /* Redirect output structure to the directory. */,
-    "rootDir": "./src" /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */,
     "moduleResolution": "node",
-    "noEmit": true,
+    "noEmit": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "preserveConstEnums": true,
-    "removeComments": false,
     "resolveJsonModule": true,
     "skipLibCheck": true,
-    "declaration": true /* Generates corresponding '.d.ts' file. */,
-    "declarationMap": true /* Generates a sourcemap for each corresponding '.d.ts' file. */,
     "sourceMap": true,
+    "declaration": true,
+    "outDir": "lib",
     "strict": true,
-    "target": "es5"
+    "removeComments": true
   },
-  "exclude": [
-    "node_modules"
-  ],
   "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx"
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "src/**/*.test.*"
   ]
 }

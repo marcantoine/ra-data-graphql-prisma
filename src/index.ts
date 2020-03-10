@@ -1,23 +1,14 @@
+import { ApolloClient, ApolloClientOptions } from 'apollo-client';
 import camelCase from 'lodash/camelCase';
 import merge from 'lodash/merge';
 import pluralize from 'pluralize';
 
 import buildDataProvider from 'ra-data-graphql';
-import {
-  CREATE,
-  DELETE,
-  DELETE_MANY,
-  GET_LIST,
-  GET_MANY,
-  GET_MANY_REFERENCE,
-  GET_ONE,
-  UPDATE,
-  UPDATE_MANY
-} from 'react-admin';
+import { CREATE, DELETE, DELETE_MANY, GET_LIST, GET_MANY, GET_MANY_REFERENCE, GET_ONE, UPDATE, UPDATE_MANY } from 'ra-core';
 
 import prismaBuildQuery from './buildQuery';
 import { Resource } from './constants/interfaces';
-import { ApolloClient, ApolloClientOptions } from 'apollo-client';
+import { GraphQLDataProvider } from 'ra-data-graphql';
 
 export const buildQuery = prismaBuildQuery;
 
@@ -48,7 +39,7 @@ export default (options: {
   debug?: boolean;
 }) => {
   return buildDataProvider(merge({}, defaultOptions, options)).then(
-    graphQLDataProvider => {
+    (graphQLDataProvider: GraphQLDataProvider) => {
       return async (
         fetchType: string,
         resource: string,
@@ -84,11 +75,11 @@ export default (options: {
         }
         const res = await graphQLDataProvider(fetchType, resource, params);
 
-        if(options.debug){
+        if (options.debug) {
           console.log('results', res);
         }
 
-        return res
+        return res;
       };
     }
   );

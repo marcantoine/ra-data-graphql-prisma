@@ -1,10 +1,4 @@
-import {
-  TypeKind,
-  IntrospectionTypeRef,
-  IntrospectionListTypeRef,
-  IntrospectionNonNullTypeRef,
-  IntrospectionNamedTypeRef
-} from 'graphql';
+import { IntrospectionListTypeRef, IntrospectionNamedTypeRef, IntrospectionNonNullTypeRef, IntrospectionTypeRef, TypeKind } from 'graphql';
 
 /**
  * Ensure we get the real type even if the root type is NON_NULL or LIST

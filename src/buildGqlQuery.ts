@@ -1,21 +1,20 @@
 import {
-  TypeKind,
-  parse,
-  IntrospectionField,
-  DocumentNode,
-  IntrospectionType,
-  IntrospectionObjectType,
-  SelectionNode,
-  VariableDefinitionNode,
   ArgumentNode,
-  FieldNode
+  DocumentNode,
+  FieldNode,
+  IntrospectionField,
+  IntrospectionObjectType,
+  parse,
+  SelectionNode,
+  TypeKind,
+  VariableDefinitionNode
 } from 'graphql';
+import { DELETE, GET_LIST, GET_MANY, GET_MANY_REFERENCE } from 'ra-core';
 import { QUERY_TYPES } from 'ra-data-graphql';
-import { GET_LIST, GET_MANY, GET_MANY_REFERENCE, DELETE } from 'react-admin';
 import { IntrospectionResult, Resource } from './constants/interfaces';
+import getFinalType from './utils/getFinalType';
 
 import * as gqlTypes from './utils/gqlTypes';
-import getFinalType from './utils/getFinalType';
 import isList from './utils/isList';
 import isRequired from './utils/isRequired';
 
@@ -64,6 +63,7 @@ export const buildFields = (introspectionResults: IntrospectionResult) => (
           gqlTypes.field(gqlTypes.name(field.name), {
             selectionSet: gqlTypes.selectionSet(
               buildFields(introspectionResults)(
+                // @ts-ignore
                 (linkedType as IntrospectionObjectType).fields
               )
             )
@@ -200,8 +200,9 @@ export default (introspectionResults: IntrospectionResult) => (
   const fields = !!fragment
     ? buildFieldsFromFragment(fragment, resource.type.name, aorFetchType)
     : buildFields(introspectionResults)(
-        (resource.type as IntrospectionObjectType).fields
-      );
+      // @ts-ignore
+      (resource.type as IntrospectionObjectType).fields
+    );
 
   if (
     aorFetchType === GET_LIST ||

@@ -1,12 +1,12 @@
-import { TypeKind, IntrospectionObjectType, IntrospectionField } from 'graphql';
-import { GET_LIST, GET_MANY, GET_MANY_REFERENCE } from 'react-admin';
-import getFinalType from './utils/getFinalType';
+import { IntrospectionField, IntrospectionObjectType, TypeKind } from 'graphql';
+import { GET_LIST, GET_MANY, GET_MANY_REFERENCE } from 'ra-core';
 import { IntrospectionResult, Resource } from './constants/interfaces';
+import getFinalType from './utils/getFinalType';
 
 const sanitizeResource = (
   introspectionResults: IntrospectionResult,
   resource: Resource,
-  fieldAliasResolver?: Function,
+  fieldAliasResolver?: Function
 ) => (data: { [key: string]: any }): any => {
   return Object.keys(data).reduce((acc, key) => {
     if (key.startsWith('_')) {
@@ -18,7 +18,7 @@ const sanitizeResource = (
         return field.name === key; // Aliased fields won't be found through such simple comparison (ie: myTitle: title)
       }
     );
-    if(typeof field === 'undefined' && fieldAliasResolver){
+    if (typeof field === 'undefined' && fieldAliasResolver) {
       // The field wasn't resolved, it's likely an alias, try to resolve alias
       const fieldAlias: IntrospectionField | undefined = (resource.type as IntrospectionObjectType).fields.find(
         field => {
@@ -27,11 +27,11 @@ const sanitizeResource = (
       );
 
       // If alias is found, copy alias property but keep the actual field name
-      if(fieldAlias){
+      if (fieldAlias) {
         field = {
           ...fieldAlias,
-          name: key,
-        }
+          name: key
+        };
       }
     }
     if (typeof field === 'undefined') {

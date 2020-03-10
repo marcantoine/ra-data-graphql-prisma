@@ -1,22 +1,21 @@
 import {
-  Kind,
+  ArgumentNode,
   DefinitionNode,
   DocumentNode,
+  FieldNode,
+  Kind,
+  ListTypeNode,
+  NamedTypeNode,
+  NameNode,
+  NonNullTypeNode,
   OperationDefinitionNode,
   OperationTypeNode,
-  NameNode,
-  VariableDefinitionNode,
-  SelectionSetNode,
   SelectionNode,
-  FieldDefinitionNode,
-  FieldNode,
-  ListTypeNode,
+  SelectionSetNode,
   TypeNode,
-  NonNullTypeNode,
-  NamedTypeNode,
-  VariableNode,
   ValueNode,
-  ArgumentNode
+  VariableDefinitionNode,
+  VariableNode
 } from 'graphql';
 
 // Functional utils to easily build GraphQL ASTs
