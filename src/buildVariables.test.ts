@@ -1,13 +1,6 @@
-import {
-  GET_LIST,
-  GET_MANY,
-  GET_MANY_REFERENCE,
-  CREATE,
-  UPDATE,
-  DELETE
-} from 'react-admin';
-import buildVariables from './buildVariables';
 import { TypeKind } from 'graphql/type/introspection';
+import { CREATE, DELETE, GET_LIST, GET_MANY, GET_MANY_REFERENCE, UPDATE } from 'ra-core';
+import buildVariables from './buildVariables';
 import { IntrospectionResult, Resource } from './constants/interfaces';
 
 describe('buildVariables', () => {
@@ -18,37 +11,38 @@ describe('buildVariables', () => {
           {
             kind: 'INPUT_OBJECT',
             name: 'PostWhereInput',
-            inputFields: [{ name: 'tags_some', type: { kind: '', name: '' } }]
-          }
-        ]
+            inputFields: [{ name: 'tags_some', type: { kind: '', name: '' } }],
+          },
+        ],
       };
       const params = {
         filter: {
           ids: ['foo1', 'foo2'],
           tags: { id: ['tag1', 'tag2'] },
           'author.id': 'author1',
-          views: 100
+          views: 100,
         },
         pagination: { page: 10, perPage: 10 },
-        sort: { field: 'sortField', order: 'DESC' }
+        sort: { field: 'sortField', order: 'DESC' },
       };
 
       expect(
+        // @ts-ignore
         buildVariables(introspectionResult as IntrospectionResult)(
           { type: { name: 'Post' } } as Resource,
           GET_LIST,
-          params
-        )
+          params,
+        ),
       ).toEqual({
         where: {
           id_in: ['foo1', 'foo2'],
           tags_some: { id_in: ['tag1', 'tag2'] },
           author: { id: 'author1' },
-          views: 100
+          views: 100,
         },
         first: 10,
         orderBy: 'sortField_DESC',
-        skip: 90
+        skip: 90,
       });
     });
   });
@@ -61,9 +55,9 @@ describe('buildVariables', () => {
             name: 'Post',
             fields: [
               {
-                name: 'title'
-              }
-            ]
+                name: 'title',
+              },
+            ],
           },
           {
             name: 'PostCreateInput',
@@ -75,9 +69,9 @@ describe('buildVariables', () => {
                   kind: TypeKind.NON_NULL,
                   ofType: {
                     kind: TypeKind.INPUT_OBJECT,
-                    name: 'AuthorCreateOneInput'
-                  }
-                }
+                    name: 'AuthorCreateOneInput',
+                  },
+                },
               },
               {
                 name: 'editor',
@@ -85,9 +79,9 @@ describe('buildVariables', () => {
                   kind: TypeKind.NON_NULL,
                   ofType: {
                     kind: TypeKind.INPUT_OBJECT,
-                    name: 'EditorCreateOneInput'
-                  }
-                }
+                    name: 'EditorCreateOneInput',
+                  },
+                },
               },
               {
                 name: 'tags',
@@ -95,9 +89,9 @@ describe('buildVariables', () => {
                   kind: TypeKind.NON_NULL,
                   ofType: {
                     kind: TypeKind.INPUT_OBJECT,
-                    name: 'TagCreateManyInput'
-                  }
-                }
+                    name: 'TagCreateManyInput',
+                  },
+                },
               },
               {
                 name: 'keywords',
@@ -105,19 +99,19 @@ describe('buildVariables', () => {
                   kind: TypeKind.NON_NULL,
                   ofType: {
                     kind: TypeKind.INPUT_OBJECT,
-                    name: 'PostCreateKeywordInput'
-                  }
-                }
+                    name: 'PostCreateKeywordInput',
+                  },
+                },
               },
               {
                 name: 'relatedPosts',
                 type: {
                   kind: TypeKind.INPUT_OBJECT,
                   name: 'RelatedPostCreateManyInput',
-                  ofType: null
-                }
+                  ofType: null,
+                },
               },
-            ]
+            ],
           },
           {
             name: 'AuthorCreateOneInput',
@@ -129,11 +123,11 @@ describe('buildVariables', () => {
                   kind: TypeKind.NON_NULL,
                   ofType: {
                     kind: TypeKind.INPUT_OBJECT,
-                    name: 'AuthorWhereUniqueInput'
-                  }
-                }
-              }
-            ]
+                    name: 'AuthorWhereUniqueInput',
+                  },
+                },
+              },
+            ],
           },
           {
             name: 'AuthorWhereUniqueInput',
@@ -143,10 +137,10 @@ describe('buildVariables', () => {
                 name: 'id',
                 type: {
                   kind: TypeKind.SCALAR,
-                  name: 'String'
-                }
-              }
-            ]
+                  name: 'String',
+                },
+              },
+            ],
           },
           {
             name: 'EditorCreateOneInput',
@@ -158,11 +152,11 @@ describe('buildVariables', () => {
                   kind: TypeKind.NON_NULL,
                   ofType: {
                     kind: TypeKind.INPUT_OBJECT,
-                    name: 'EditorWhereUniqueInput'
-                  }
-                }
-              }
-            ]
+                    name: 'EditorWhereUniqueInput',
+                  },
+                },
+              },
+            ],
           },
           {
             name: 'EditorWhereUniqueInput',
@@ -172,17 +166,17 @@ describe('buildVariables', () => {
                 name: 'id',
                 type: {
                   kind: TypeKind.SCALAR,
-                  name: 'String'
-                }
+                  name: 'String',
+                },
               },
               {
                 name: 'ref',
                 type: {
                   kind: TypeKind.SCALAR,
-                  name: 'String'
-                }
+                  name: 'String',
+                },
               },
-            ]
+            ],
           },
           {
             name: 'TagCreateManyInput',
@@ -194,11 +188,11 @@ describe('buildVariables', () => {
                   kind: TypeKind.NON_NULL,
                   ofType: {
                     kind: TypeKind.INPUT_OBJECT,
-                    name: 'TagWhereUniqueInput'
-                  }
-                }
-              }
-            ]
+                    name: 'TagWhereUniqueInput',
+                  },
+                },
+              },
+            ],
           },
           {
             name: 'TagWhereUniqueInput',
@@ -208,10 +202,10 @@ describe('buildVariables', () => {
                 name: 'id',
                 type: {
                   kind: TypeKind.SCALAR,
-                  name: 'String'
-                }
-              }
-            ]
+                  name: 'String',
+                },
+              },
+            ],
           },
           {
             name: 'PostCreateKeywordInput',
@@ -225,11 +219,11 @@ describe('buildVariables', () => {
                     kind: TypeKind.NON_NULL,
                     ofType: {
                       kind: TypeKind.SCALAR,
-                    }
-                  }
-                }
-              }
-            ]
+                    },
+                  },
+                },
+              },
+            ],
           },
           {
             name: 'RelatedPostCreateManyInput',
@@ -243,12 +237,12 @@ describe('buildVariables', () => {
                     kind: TypeKind.NON_NULL,
                     ofType: {
                       kind: TypeKind.INPUT_OBJECT,
-                      name: "RelatedPostWhereUniqueInput",
-                    }
-                  }
-                }
-              }
-            ]
+                      name: 'RelatedPostWhereUniqueInput',
+                    },
+                  },
+                },
+              },
+            ],
           },
           {
             name: 'RelatedPostWhereUniqueInput',
@@ -258,45 +252,46 @@ describe('buildVariables', () => {
                 name: 'id',
                 type: {
                   kind: TypeKind.SCALAR,
-                  name: 'ID'
-                }
-              }
-            ]
+                  name: 'ID',
+                },
+              },
+            ],
           },
-        ]
+        ],
       };
 
       const params = {
         data: {
-          author: { id: 'author1', name: "author1name" },
-          editor: { ref: 'editor1code', code: "editor1name" },
+          author: { id: 'author1', name: 'author1name' },
+          editor: { ref: 'editor1code', code: 'editor1name' },
           title: 'Foo',
           tags: [{ id: 'tags1' }, { id: 'tags2' }],
           keywords: ['keyword1', 'keyword2'],
-          relatedPostsIds: ["relatedPost1", "relatedPost2"],
-          relatedPosts: [{ id: "relatedPost1", name: "postName1" }, { id: "relatedPost2", name: "postName2" }],
-        }
+          relatedPostsIds: ['relatedPost1', 'relatedPost2'],
+          relatedPosts: [{ id: 'relatedPost1', name: 'postName1' }, { id: 'relatedPost2', name: 'postName2' }],
+        },
       };
 
       expect(
+        // @ts-ignore
         buildVariables(introspectionResult as IntrospectionResult)(
           { type: { name: 'Post' } } as Resource,
           CREATE,
-          params
-        )
+          params,
+        ),
       ).toEqual({
         data: {
           author: { connect: { id: 'author1' } },
           editor: { connect: { ref: 'editor1code' } },
           tags: {
-            connect: [{ id: 'tags1' }, { id: 'tags2' }]
+            connect: [{ id: 'tags1' }, { id: 'tags2' }],
           },
           keywords: { set: ['keyword1', 'keyword2'] },
           relatedPosts: {
-            connect: [{ id: "relatedPost1" }, { id: "relatedPost2" }]
+            connect: [{ id: 'relatedPost1' }, { id: 'relatedPost2' }],
           },
-          title: 'Foo'
-        }
+          title: 'Foo',
+        },
       });
     });
   });
@@ -307,7 +302,7 @@ describe('buildVariables', () => {
         types: [
           {
             name: 'Post',
-            fields: [{ name: 'title' }]
+            fields: [{ name: 'title' }],
           },
           {
             name: 'PostUpdateInput',
@@ -319,9 +314,9 @@ describe('buildVariables', () => {
                   kind: TypeKind.NON_NULL,
                   ofType: {
                     kind: TypeKind.INPUT_OBJECT,
-                    name: 'AuthorUpdateOneInput'
-                  }
-                }
+                    name: 'AuthorUpdateOneInput',
+                  },
+                },
               },
               {
                 name: 'editor',
@@ -329,9 +324,9 @@ describe('buildVariables', () => {
                   kind: TypeKind.NON_NULL,
                   ofType: {
                     kind: TypeKind.INPUT_OBJECT,
-                    name: 'EditorUpdateOneInput'
-                  }
-                }
+                    name: 'EditorUpdateOneInput',
+                  },
+                },
               },
               {
                 name: 'tags',
@@ -339,9 +334,9 @@ describe('buildVariables', () => {
                   kind: TypeKind.NON_NULL,
                   ofType: {
                     kind: TypeKind.INPUT_OBJECT,
-                    name: 'TagsUpdateManyInput'
-                  }
-                }
+                    name: 'TagsUpdateManyInput',
+                  },
+                },
               },
               {
                 name: 'keywords',
@@ -349,19 +344,19 @@ describe('buildVariables', () => {
                   kind: TypeKind.NON_NULL,
                   ofType: {
                     kind: TypeKind.INPUT_OBJECT,
-                    name: 'PostUpdateKeywordInput'
-                  }
-                }
+                    name: 'PostUpdateKeywordInput',
+                  },
+                },
               },
               {
                 name: 'relatedPosts',
                 type: {
                   kind: TypeKind.INPUT_OBJECT,
                   name: 'RelatedPostUpdateManyInput',
-                  ofType: null
-                }
+                  ofType: null,
+                },
               },
-            ]
+            ],
           },
           {
             name: 'AuthorUpdateOneInput',
@@ -373,11 +368,11 @@ describe('buildVariables', () => {
                   kind: TypeKind.NON_NULL,
                   ofType: {
                     kind: TypeKind.INPUT_OBJECT,
-                    name: 'AuthorWhereUniqueInput'
-                  }
-                }
-              }
-            ]
+                    name: 'AuthorWhereUniqueInput',
+                  },
+                },
+              },
+            ],
           },
           {
             name: 'EditorUpdateOneInput',
@@ -389,11 +384,11 @@ describe('buildVariables', () => {
                   kind: TypeKind.NON_NULL,
                   ofType: {
                     kind: TypeKind.INPUT_OBJECT,
-                    name: 'EditorWhereUniqueInput'
-                  }
-                }
-              }
-            ]
+                    name: 'EditorWhereUniqueInput',
+                  },
+                },
+              },
+            ],
           },
           {
             name: 'TagsUpdateManyInput',
@@ -405,11 +400,11 @@ describe('buildVariables', () => {
                   kind: TypeKind.NON_NULL,
                   ofType: {
                     kind: TypeKind.INPUT_OBJECT,
-                    name: 'TagsWhereUniqueInput'
-                  }
-                }
-              }
-            ]
+                    name: 'TagsWhereUniqueInput',
+                  },
+                },
+              },
+            ],
           },
           {
             name: 'PostUpdateKeywordInput',
@@ -423,11 +418,11 @@ describe('buildVariables', () => {
                     kind: TypeKind.NON_NULL,
                     ofType: {
                       kind: TypeKind.SCALAR,
-                    }
-                  }
-                }
-              }
-            ]
+                    },
+                  },
+                },
+              },
+            ],
           },
           {
             name: 'RelatedPostUpdateManyInput',
@@ -441,10 +436,10 @@ describe('buildVariables', () => {
                     kind: TypeKind.NON_NULL,
                     ofType: {
                       kind: TypeKind.INPUT_OBJECT,
-                      name: "RelatedPostWhereUniqueInput",
-                    }
-                  }
-                }
+                      name: 'RelatedPostWhereUniqueInput',
+                    },
+                  },
+                },
               },
               {
                 name: 'disconnect',
@@ -454,12 +449,12 @@ describe('buildVariables', () => {
                     kind: TypeKind.NON_NULL,
                     ofType: {
                       kind: TypeKind.INPUT_OBJECT,
-                      name: "RelatedPostWhereUniqueInput",
-                    }
-                  }
+                      name: 'RelatedPostWhereUniqueInput',
+                    },
+                  },
                 },
               },
-            ]
+            ],
           },
           {
             name: 'TagsWhereUniqueInput',
@@ -469,10 +464,10 @@ describe('buildVariables', () => {
                 name: 'id',
                 type: {
                   kind: TypeKind.SCALAR,
-                  name: 'String'
-                }
-              }
-            ]
+                  name: 'String',
+                },
+              },
+            ],
           },
           {
             name: 'AuthorWhereUniqueInput',
@@ -482,10 +477,10 @@ describe('buildVariables', () => {
                 name: 'id',
                 type: {
                   kind: TypeKind.SCALAR,
-                  name: 'String'
-                }
-              }
-            ]
+                  name: 'String',
+                },
+              },
+            ],
           },
           {
             name: 'EditorWhereUniqueInput',
@@ -495,17 +490,17 @@ describe('buildVariables', () => {
                 name: 'ref',
                 type: {
                   kind: TypeKind.SCALAR,
-                  name: 'String'
-                }
+                  name: 'String',
+                },
               },
               {
                 name: 'code',
                 type: {
                   kind: TypeKind.SCALAR,
-                  name: 'String'
-                }
-              }
-            ]
+                  name: 'String',
+                },
+              },
+            ],
           },
           {
             name: 'RelatedPostWhereUniqueInput',
@@ -515,12 +510,12 @@ describe('buildVariables', () => {
                 name: 'id',
                 type: {
                   kind: TypeKind.SCALAR,
-                  name: 'ID'
-                }
-              }
-            ]
+                  name: 'ID',
+                },
+              },
+            ],
           },
-        ]
+        ],
       };
 
       const params = {
@@ -529,26 +524,27 @@ describe('buildVariables', () => {
           tags: [{ id: 'tags1', code: 'tags1code' }, { id: 'tags2', code: 'tags2scode' }],
           keywords: ['keyword1', 'keyword2'],
           author: { id: 'author1', name: 'author1name' },
-          editor: { ref: 'editor1code', code: "editor1name" },
-          relatedPostsIds: ["relatedPost1", "relatedPost2"],
-          relatedPosts: [{ id: "relatedPost1", name: "postName1" }, { id: "relatedPost2", name: "postName2" }],
-          title: 'Foo'
+          editor: { ref: 'editor1code', code: 'editor1name' },
+          relatedPostsIds: ['relatedPost1', 'relatedPost2'],
+          relatedPosts: [{ id: 'relatedPost1', name: 'postName1' }, { id: 'relatedPost2', name: 'postName2' }],
+          title: 'Foo',
         },
         previousData: {
           tags: [{ id: 'tags1' }, { id: 'tags3' }],
           keywords: ['keyword1'],
-          editor: { ref: 'editor2code', code: "editor2name" },
-          relatedPosts: [{ id: "relatedPost1", name: "postName1" }, { id: "relatedPost3", name: "postName3" }],
-          relatedPostsIds: ["relatedPost1", "relatedPost3"],
-        }
+          editor: { ref: 'editor2code', code: 'editor2name' },
+          relatedPosts: [{ id: 'relatedPost1', name: 'postName1' }, { id: 'relatedPost3', name: 'postName3' }],
+          relatedPostsIds: ['relatedPost1', 'relatedPost3'],
+        },
       };
 
       expect(
+        // @ts-ignore
         buildVariables(introspectionResult as IntrospectionResult)(
           { type: { name: 'Post' } } as Resource,
           UPDATE,
-          params
-        )
+          params,
+        ),
       ).toEqual({
         where: { id: 'postId' },
         data: {
@@ -556,15 +552,15 @@ describe('buildVariables', () => {
           editor: { connect: { ref: 'editor1code' } },
           tags: {
             connect: [{ id: 'tags2' }],
-            disconnect: [{ id: "tags3" }]
+            disconnect: [{ id: 'tags3' }],
           },
           keywords: { set: ['keyword1', 'keyword2'] },
           relatedPosts: {
-            connect: [{ id: "relatedPost2" }],
-            disconnect: [{ id: "relatedPost3" }]
+            connect: [{ id: 'relatedPost2' }],
+            disconnect: [{ id: 'relatedPost3' }],
           },
-          title: 'Foo'
-        }
+          title: 'Foo',
+        },
       });
     });
   });
@@ -572,17 +568,17 @@ describe('buildVariables', () => {
   describe('GET_MANY', () => {
     it('returns correct variables', () => {
       const params = {
-        ids: ['tag1', 'tag2']
+        ids: ['tag1', 'tag2'],
       };
 
       expect(
         buildVariables({} as IntrospectionResult)(
           { type: { name: 'Post' } } as Resource,
           GET_MANY,
-          params
-        )
+          params,
+        ),
       ).toEqual({
-        where: { id_in: ['tag1', 'tag2'] }
+        where: { id_in: ['tag1', 'tag2'] },
       });
     });
   });
@@ -591,17 +587,17 @@ describe('buildVariables', () => {
     it('returns correct variables', () => {
       const params = {
         target: 'author.id',
-        id: 'author1'
+        id: 'author1',
       };
 
       expect(
         buildVariables({} as IntrospectionResult)(
           { type: { name: 'Post' } } as Resource,
           GET_MANY_REFERENCE,
-          params
-        )
+          params,
+        ),
       ).toEqual({
-        where: { author: { id: 'author1' } }
+        where: { author: { id: 'author1' } },
       });
     });
   });
@@ -609,17 +605,17 @@ describe('buildVariables', () => {
   describe('DELETE', () => {
     it('returns correct variables', () => {
       const params = {
-        id: 'post1'
+        id: 'post1',
       };
 
       expect(
         buildVariables({} as IntrospectionResult)(
           { type: { name: 'Post', inputFields: [] } } as any,
           DELETE,
-          params
-        )
+          params,
+        ),
       ).toEqual({
-        where: { id: 'post1' }
+        where: { id: 'post1' },
       });
     });
   });

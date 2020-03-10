@@ -24,7 +24,7 @@ Be aware that it might not be working because of that, or that performances may 
 
 ## What is react admin ? And what's @unly/ra-data-graphql-prisma ?
 
-[Find out more about the benefits of using `react-admin` with Prisma here.](context.md) 
+[Find out more about the benefits of using `react-admin` with Prisma here.](CONTEXT.md) 
 
 Prisma V1 offers a full graphQL CRUD Server out of the box. This module allows to use react-admin directly on Prisma Server.
 

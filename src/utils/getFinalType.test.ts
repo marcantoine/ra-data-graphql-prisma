@@ -13,7 +13,7 @@ describe('getFinalType', () => {
       getFinalType({
         kind: TypeKind.NON_NULL,
         ofType: { name: 'foo', kind: TypeKind.SCALAR },
-      })
+      }),
     ).toEqual({
       name: 'foo',
       kind: TypeKind.SCALAR,
@@ -24,7 +24,7 @@ describe('getFinalType', () => {
       getFinalType({
         kind: TypeKind.LIST,
         ofType: { name: 'foo', kind: TypeKind.SCALAR },
-      })
+      }),
     ).toEqual({
       name: 'foo',
       kind: TypeKind.SCALAR,
@@ -38,7 +38,7 @@ describe('getFinalType', () => {
           kind: TypeKind.LIST,
           ofType: { name: 'foo', kind: TypeKind.SCALAR },
         },
-      })
+      }),
     ).toEqual({ name: 'foo', kind: TypeKind.SCALAR });
   });
 });
