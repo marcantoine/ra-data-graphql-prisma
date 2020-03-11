@@ -1,6 +1,6 @@
 {
   "name": "@unly/ra-data-graphql-prisma",
-  "version": "1.0.0-beta.3",
+  "version": "1.0.0-beta.4",
   "description": "A react-admin data provider for Prisma Server",
   "scripts": {
     "start": "cross-env-shell 'concurrently -p '{name}' -n 'lint,build,test' -c 'gray.bgWhite,yellow.bgBlue,green.bgWhite' \"yarn lint\" \"yarn build\" \"yarn test\"'",
