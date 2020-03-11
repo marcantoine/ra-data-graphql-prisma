@@ -52,6 +52,14 @@ export declare type UpdateParams = {
 }
 
 /**
+ * Couldn't find any real use-case for that
+ * XXX Unsure
+ */
+export declare type UpdateManyParams = {
+  ids: string[];
+}
+
+/**
  * When deleting in bulk, one request is executed for each record to delete and "params" only contains the "id" field
  * When deleting from the edit view, the "params" also contains the "previousData" field
  *
@@ -61,6 +69,16 @@ export declare type UpdateParams = {
 export declare type DeleteParams = {
   id: string;
   previousData?: { [key: string]: any };
+}
+
+/**
+ * When deleting in bulk, a DELETE_MANY operation is sent, which is converted to multiple DELETE operations (because DELETE_MANY isn't implemented)
+ * What's really executed is a set of DELETE mutations
+ *
+ * @example {ids: ["cjvzapz4u04r8094169qvaobl", "cjvzas7gw05dl09418zgles6j"]}
+ */
+export declare type DeleteManyParams = {
+  ids: string[];
 }
 
 /**

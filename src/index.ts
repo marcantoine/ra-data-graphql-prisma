@@ -8,6 +8,7 @@ import buildDataProvider, { GraphQLDataProvider } from 'ra-data-graphql';
 
 import prismaBuildQuery from './buildQuery';
 import { Resource } from './constants/interfaces';
+import { DeleteManyParams, GetManyParams, Params, UpdateManyParams } from './types/Params';
 
 export const buildQuery = prismaBuildQuery;
 
@@ -42,11 +43,13 @@ export default (options: {
       return async (
         fetchType: string,
         resource: string,
-        params: { [key: string]: any },
+        params: Params,
       ): Promise<any> => {
-        // Temporary work-around until we make use of updateMany and deleteMany mutations
+        // XXX Temporary work-around until we make use of updateMany and deleteMany mutations
+        //  Currently perform one request/mutation per record instead of performing all mutations at once in the same request
+        //  GraphCMS supports bulk delete/update so it could be implemented properly
         if (fetchType === DELETE_MANY) {
-          const { ids, ...otherParams } = params;
+          const { ids, ...otherParams } = params as DeleteManyParams;
           return Promise.all(
             ids.map((id: string) =>
               graphQLDataProvider(DELETE, resource, {
@@ -60,7 +63,7 @@ export default (options: {
         }
 
         if (fetchType === UPDATE_MANY) {
-          const { ids, ...otherParams } = params;
+          const { ids, ...otherParams } = params as UpdateManyParams;
           return Promise.all(
             ids.map((id: string) =>
               graphQLDataProvider(UPDATE, resource, {
