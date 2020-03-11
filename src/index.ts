@@ -2,9 +2,7 @@ import { ApolloClient, ApolloClientOptions } from 'apollo-client';
 import camelCase from 'lodash/camelCase';
 import merge from 'lodash/merge';
 import pluralize from 'pluralize';
-import {
-  CREATE, DELETE, DELETE_MANY, GET_LIST, GET_MANY, GET_MANY_REFERENCE, GET_ONE, UPDATE, UPDATE_MANY 
-} from 'ra-core';
+import { CREATE, DELETE, DELETE_MANY, GET_LIST, GET_MANY, GET_MANY_REFERENCE, GET_ONE, UPDATE, UPDATE_MANY } from 'ra-core';
 
 import buildDataProvider, { GraphQLDataProvider } from 'ra-data-graphql';
 
@@ -17,16 +15,16 @@ const defaultOptions = {
   buildQuery,
   introspection: {
     operationNames: {
-      [GET_LIST]: (resource: Resource) =>
+      [GET_LIST]: (resource: Resource): string =>
         `${pluralize(camelCase(resource.name))}`,
-      [GET_ONE]: (resource: Resource) => `${camelCase(resource.name)}`,
-      [GET_MANY]: (resource: Resource) =>
+      [GET_ONE]: (resource: Resource): string => `${camelCase(resource.name)}`,
+      [GET_MANY]: (resource: Resource): string =>
         `${pluralize(camelCase(resource.name))}`,
-      [GET_MANY_REFERENCE]: (resource: Resource) =>
+      [GET_MANY_REFERENCE]: (resource: Resource): string =>
         `${pluralize(camelCase(resource.name))}`,
-      [CREATE]: (resource: Resource) => `create${resource.name}`,
-      [UPDATE]: (resource: Resource) => `update${resource.name}`,
-      [DELETE]: (resource: Resource) => `delete${resource.name}`,
+      [CREATE]: (resource: Resource): string => `create${resource.name}`,
+      [UPDATE]: (resource: Resource): string => `update${resource.name}`,
+      [DELETE]: (resource: Resource): string => `delete${resource.name}`,
     },
     exclude: undefined,
     include: undefined,
@@ -50,7 +48,7 @@ export default (options: {
         if (fetchType === DELETE_MANY) {
           const { ids, ...otherParams } = params;
           return Promise.all(
-            params.ids.map((id: string) =>
+            ids.map((id: string) =>
               graphQLDataProvider(DELETE, resource, {
                 id,
                 ...otherParams,
@@ -64,7 +62,7 @@ export default (options: {
         if (fetchType === UPDATE_MANY) {
           const { ids, ...otherParams } = params;
           return Promise.all(
-            params.ids.map((id: string) =>
+            ids.map((id: string) =>
               graphQLDataProvider(UPDATE, resource, {
                 id,
                 ...otherParams,
@@ -77,7 +75,8 @@ export default (options: {
         const res = await graphQLDataProvider(fetchType, resource, params);
 
         if (options.debug) {
-          console.log('results', res);
+          // eslint-disable-next-line no-console
+          console.debug('ra-data-graphql-prisma - results', res);
         }
 
         return res;
