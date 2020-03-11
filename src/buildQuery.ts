@@ -6,6 +6,7 @@ import { IntrospectionResult } from './constants/interfaces';
 import getResponseParser from './getResponseParser';
 import { BuildQueryFactorySignature, BuildQueryResult } from './types/BuildQuery';
 import { GqlVariables } from './types/GqlVariables';
+import { Params } from './types/Params';
 
 export const buildQueryFactory = () => (
   introspectionResults: IntrospectionResult,
@@ -16,7 +17,7 @@ export const buildQueryFactory = () => (
   return (
     aorFetchType: string,
     resourceName: string,
-    params: any,
+    params: Params,
     fragment: DocumentNode,
   ): BuildQueryResult => {
     const resource = introspectionResults.resources.find(

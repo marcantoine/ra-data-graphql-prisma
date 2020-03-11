@@ -6,15 +6,10 @@ import { CREATE, DELETE, GET_LIST, GET_MANY, GET_MANY_REFERENCE, GET_ONE, UPDATE
 import { IntrospectionResult, Resource } from './constants/interfaces';
 
 import { PRISMA_CONNECT, PRISMA_DISCONNECT, PRISMA_SET } from './constants/mutations';
+import { CreateParams, DeleteParams, GetListParams, GetManyParams, GetManyReferenceParams, GetOneParams, Params, UpdateParams } from './types/Params';
 import { computeFieldsToAddRemoveUpdate } from './utils/computeAddRemoveUpdate';
 
 import getFinalType from './utils/getFinalType';
-
-interface GetListParams {
-  filter: { [key: string]: any };
-  pagination: { page: number; perPage: number };
-  sort: { field: string; order: string };
-}
 
 //TODO: Object filter weren't tested yet
 const buildGetListVariables = (introspectionResults: IntrospectionResult) => (
@@ -167,12 +162,6 @@ const buildReferenceField = (
   }, {});
 };
 
-interface UpdateParams {
-  id: string;
-  data: { [key: string]: any };
-  previousData: { [key: string]: any };
-}
-
 const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
   resource: Resource,
   aorFetchType: string,
@@ -303,10 +292,6 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
   {} as { [key: string]: any },
 );
 
-interface CreateParams {
-  data: { [key: string]: any };
-}
-
 const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
   resource: Resource,
   aorFetchType: string,
@@ -435,36 +420,36 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
 export default (introspectionResults: IntrospectionResult) => (
   resource: Resource,
   aorFetchType: string,
-  params: any,
+  params: Params,
 ) => {
   switch (aorFetchType) {
     case GET_LIST: {
       return buildGetListVariables(introspectionResults)(
         resource,
         aorFetchType,
-        params,
+        params as GetListParams,
       );
     }
     case GET_MANY:
       return {
-        where: { id_in: params.ids },
+        where: { id_in: (params as GetManyParams).ids },
       };
     case GET_MANY_REFERENCE: {
-      const parts = params.target.split('.');
+      const parts = (params as GetManyReferenceParams).target.split('.');
 
       return {
-        where: { [parts[0]]: { id: params.id } },
+        where: { [parts[0]]: { id: (params as GetOneParams).id } },
       };
     }
     case GET_ONE:
       return {
-        where: { id: params.id },
+        where: { id: (params as GetOneParams).id },
       };
     case UPDATE: {
       return buildUpdateVariables(introspectionResults)(
         resource,
         aorFetchType,
-        params,
+        params as UpdateParams,
       );
     }
 
@@ -472,13 +457,13 @@ export default (introspectionResults: IntrospectionResult) => (
       return buildCreateVariables(introspectionResults)(
         resource,
         aorFetchType,
-        params,
+        params as CreateParams,
       );
     }
 
     case DELETE:
       return {
-        where: { id: params.id },
+        where: { id: (params as DeleteParams).id },
       };
   }
 };
