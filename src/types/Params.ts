@@ -2,7 +2,7 @@
  * When displaying a list of records
  */
 export declare type GetListParams = {
-  filter: { [key: string]: any };
+  filter: { [key: string]: any }; // eslint-disable-line @typescript-eslint/no-explicit-any
   pagination: { page: number; perPage: number };
   sort: { field: string; order: string };
 }
@@ -36,7 +36,7 @@ export declare type GetManyReferenceParams = {
  * @example {"data":{"price":5,"titleEN":"test","titleFR":"test"}}
  */
 export declare type CreateParams = {
-  data: { [key: string]: any };
+  data: { [key: string]: any }; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 /**
@@ -47,8 +47,8 @@ export declare type CreateParams = {
  */
 export declare type UpdateParams = {
   id: string;
-  data: { [key: string]: any };
-  previousData: { [key: string]: any };
+  data: { [key: string]: any }; // eslint-disable-line @typescript-eslint/no-explicit-any
+  previousData: { [key: string]: any }; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 /**
@@ -68,7 +68,7 @@ export declare type UpdateManyParams = {
  */
 export declare type DeleteParams = {
   id: string;
-  previousData?: { [key: string]: any };
+  previousData?: { [key: string]: any }; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 /**
