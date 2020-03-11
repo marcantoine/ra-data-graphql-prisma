@@ -7,10 +7,11 @@ import getResponseParser from './getResponseParser';
 import { BuildQueryFactorySignature, BuildQueryResult } from './types/BuildQuery';
 import { GqlVariables } from './types/GqlVariables';
 import { Params } from './types/Params';
+import { RAGqlPrismaFieldAliasResolver } from './types/RAGqlPrismaFieldAliasResolver';
 
 export const buildQueryFactory = () => (
   introspectionResults: IntrospectionResult,
-  fieldAliasResolver?: Function,
+  fieldAliasResolver?: RAGqlPrismaFieldAliasResolver,
 ): BuildQueryFactorySignature => {
   const knownResources = introspectionResults.resources.map((r) => r.type.name);
 

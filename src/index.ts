@@ -1,4 +1,3 @@
-import { ApolloClient, ApolloClientOptions } from 'apollo-client';
 import camelCase from 'lodash/camelCase';
 import merge from 'lodash/merge';
 import pluralize from 'pluralize';
@@ -8,11 +7,12 @@ import buildDataProvider, { GraphQLDataProvider } from 'ra-data-graphql';
 
 import prismaBuildQuery from './buildQuery';
 import { Resource } from './constants/interfaces';
-import { DeleteManyParams, GetManyParams, Params, UpdateManyParams } from './types/Params';
+import { DeleteManyParams, Params, UpdateManyParams } from './types/Params';
+import { RAGqlPrismaOptions } from './types/RAGqlPrismaOptions';
 
 export const buildQuery = prismaBuildQuery;
 
-const defaultOptions = {
+const defaultOptions: RAGqlPrismaOptions = {
   buildQuery,
   introspection: {
     operationNames: {
@@ -30,15 +30,15 @@ const defaultOptions = {
     exclude: undefined,
     include: undefined,
   },
+  debug: true,
 };
 
 //TODO: Prisma supports batching (UPDATE_MANY, DELETE_MANY)
-export default (options: {
-  client?: ApolloClient<any>;
-  clientOptions?: ApolloClientOptions<any>;
-  debug?: boolean;
-}) => {
-  return buildDataProvider(merge({}, defaultOptions, options)).then(
+export default (options: RAGqlPrismaOptions): Promise<GraphQLDataProvider | any> => {
+  // Apply default options
+  options = merge({}, defaultOptions, options);
+
+  return buildDataProvider(options).then(
     (graphQLDataProvider: GraphQLDataProvider) => {
       return async (
         fetchType: string,

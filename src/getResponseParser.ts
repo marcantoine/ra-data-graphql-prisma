@@ -4,6 +4,7 @@ import { IntrospectionResult, Resource } from './constants/interfaces';
 import { ApolloResponse } from './types/ApolloResponse';
 import { ApolloResponseData, MultipleRecordsResponse, SingleRecordResponse } from './types/ApolloResponseData';
 import { GqlRecord } from './types/GqlRecord';
+import { RAGqlPrismaFieldAliasResolver } from './types/RAGqlPrismaFieldAliasResolver';
 import { GetResponseParserSignature, ResponseParserResult, ResponseParserSignature } from './types/ResponseParser';
 import getFinalType from './utils/getFinalType';
 
@@ -12,7 +13,7 @@ declare type Sanitize = (record: GqlRecord) => any;
 const sanitizeResource = (
   introspectionResults: IntrospectionResult,
   resource: Resource,
-  fieldAliasResolver?: Function,
+  fieldAliasResolver?: RAGqlPrismaFieldAliasResolver,
 ) => (record: GqlRecord): any => {
   return Object.keys(record).reduce((acc, fieldName: string) => {
     if (fieldName.startsWith('_')) {
@@ -27,7 +28,7 @@ const sanitizeResource = (
     if (typeof field === 'undefined' && fieldAliasResolver) {
       // The field wasn't resolved, it's likely an alias, try to resolve alias
       const fieldAlias: IntrospectionField | undefined = (resource.type as IntrospectionObjectType).fields.find(
-        (field) => {
+        (field: IntrospectionField) => {
           return field.name === fieldAliasResolver(field, fieldName, acc, introspectionResults);
         },
       );
@@ -89,7 +90,7 @@ const sanitizeResource = (
   }, {});
 };
 
-export default (introspectionResults: IntrospectionResult, fieldAliasResolver?: Function): GetResponseParserSignature => (
+export default (introspectionResults: IntrospectionResult, fieldAliasResolver?: RAGqlPrismaFieldAliasResolver): GetResponseParserSignature => (
   aorFetchType: string,
   resource: Resource,
 ): ResponseParserSignature => (response: ApolloResponse): ResponseParserResult => {
