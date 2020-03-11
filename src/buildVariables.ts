@@ -1,20 +1,16 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { IntrospectionInputObjectType, IntrospectionNamedTypeRef, IntrospectionObjectType } from 'graphql';
+import { IntrospectionField, IntrospectionInputObjectType, IntrospectionNamedTypeRef, IntrospectionObjectType } from 'graphql';
 import isDate from 'lodash/isDate';
 import isObject from 'lodash/isObject';
 import { CREATE, DELETE, GET_LIST, GET_MANY, GET_MANY_REFERENCE, GET_ONE, UPDATE } from 'ra-core';
 import { IntrospectionResult, Resource } from './constants/interfaces';
 
 import { PRISMA_CONNECT, PRISMA_DISCONNECT, PRISMA_SET } from './constants/mutations';
+import { CreateParams, DeleteParams, GetListParams, GetManyParams, GetManyReferenceParams, GetOneParams, Params, UpdateParams } from './types/Params';
+import { RAGqlPrismaFieldAliasResolver } from './types/RAGqlPrismaFieldAliasResolver';
 import { computeFieldsToAddRemoveUpdate } from './utils/computeAddRemoveUpdate';
 
 import getFinalType from './utils/getFinalType';
-
-interface GetListParams {
-  filter: { [key: string]: any };
-  pagination: { page: number; perPage: number };
-  sort: { field: string; order: string };
-}
 
 //TODO: Object filter weren't tested yet
 const buildGetListVariables = (introspectionResults: IntrospectionResult) => (
@@ -167,160 +163,168 @@ const buildReferenceField = (
   }, {});
 };
 
-interface UpdateParams {
-  id: string;
-  data: { [key: string]: any };
-  previousData: { [key: string]: any };
-}
-
 const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
   resource: Resource,
   aorFetchType: string,
   params: UpdateParams,
-) => Object.keys(params.data).reduce(
-  (acc, key) => {
-    let data = params.data[key];
-    let previousData = params.previousData[key];
-    if (Array.isArray(data)) {
+  fieldAliasResolver?: RAGqlPrismaFieldAliasResolver,
+) => {
+  return Object.keys(params.data).reduce(
+    (acc, fieldName: string) => {
+      let data = params.data[fieldName];
+      let previousData = params.previousData[fieldName];
 
-      // if key finish with Ids, its an array of relation
-      if (/Ids$/.test(key)) {
-        previousData = params.previousData[key].map((id: string) => ({ id }));
-        //we remove Ids form field
-        key = key.replace(/Ids$/, '');
-        //and put id in the array
-        data = data.map((id: string) => ({ id }));
+      if (Array.isArray(data)) {
 
-      }
+        // if key finish with Ids, its an array of relation
+        if (/Ids$/.test(fieldName)) {
+          previousData = params.previousData[fieldName].map((id: string) => ({ id }));
+          //we remove Ids form field
+          fieldName = fieldName.replace(/Ids$/, '');
+          //and put id in the array
+          data = data.map((id: string) => ({ id }));
+        }
 
-      const inputType = findInputFieldForType(
-        introspectionResults,
-        `${resource.type.name}UpdateInput`,
-        key,
-      );
+        const inputType = findInputFieldForType(
+          introspectionResults,
+          `${resource.type.name}UpdateInput`,
+          fieldName,
+        );
 
-      if (!inputType) {
-        return acc;
-      }
+        if (!inputType) {
+          return acc;
+        }
 
-      // if its an array, it can be an array of relation or an array of Scalar
-      // we check the corresponding input in introspectionresult to know if it use "set" or something else
+        // if its an array, it can be an array of relation or an array of Scalar
+        // we check the corresponding input in introspectionresult to know if it use "set" or something else
 
-      const hasConnectMethod = findInputFieldForType(
-        introspectionResults,
-        inputType.name,
-        'connect',
-      );
-      if (!hasConnectMethod) {
+        const hasConnectMethod = findInputFieldForType(
+          introspectionResults,
+          inputType.name,
+          'connect',
+        );
+        if (!hasConnectMethod) {
+          return {
+            ...acc,
+            data: {
+              ...acc.data,
+              [fieldName]: {
+                [PRISMA_SET]: data,
+              },
+            },
+          };
+        }
+
+        //if key connect already exist we dont do anything
+        const {
+          fieldsToAdd,
+          fieldsToRemove,
+        } = computeFieldsToAddRemoveUpdate(
+          previousData,
+          data,
+        );
         return {
           ...acc,
           data: {
             ...acc.data,
-            [key]: {
-              [PRISMA_SET]: data,
+            [fieldName]: {
+              [PRISMA_CONNECT]: fieldsToAdd,
+              [PRISMA_DISCONNECT]: fieldsToRemove,
             },
           },
         };
       }
 
-      //if key connect already exist we dont do anything
-      const {
-        fieldsToAdd,
-        fieldsToRemove,
-      } = computeFieldsToAddRemoveUpdate(
-        previousData,
-        data,
-      );
-      return {
-        ...acc,
-        data: {
-          ...acc.data,
-          [key]: {
-            [PRISMA_CONNECT]: fieldsToAdd,
-            [PRISMA_DISCONNECT]: fieldsToRemove,
+      if (isObject(data) && !isDate(data)) {
+
+        const fieldsToUpdate = buildReferenceField({
+          inputArg: data,
+          introspectionResults,
+          typeName: `${resource.type.name}UpdateInput`,
+          field: fieldName,
+          mutationType: PRISMA_CONNECT,
+        });
+
+        console.log('fieldsToUpdate', fieldsToUpdate);
+
+        // If no fields in the object are valid, continue
+        if (Object.keys(fieldsToUpdate).length === 0) {
+          return acc;
+        }
+
+        // Else, connect the nodes
+        return {
+          ...acc,
+          data: {
+            ...acc.data,
+            [fieldName]: { [PRISMA_CONNECT]: { ...fieldsToUpdate } },
           },
-        },
-      };
-    }
-
-    if (isObject(data) && !isDate(data)) {
-
-      const fieldsToUpdate = buildReferenceField({
-        inputArg: data,
-        introspectionResults,
-        typeName: `${resource.type.name}UpdateInput`,
-        field: key,
-        mutationType: PRISMA_CONNECT,
-      });
-
-      console.log('fieldsToUpdate', fieldsToUpdate);
-
-      // If no fields in the object are valid, continue
-      if (Object.keys(fieldsToUpdate).length === 0) {
-        return acc;
+        };
       }
 
-      // Else, connect the nodes
-      return {
-        ...acc,
-        data: {
-          ...acc.data,
-          [key]: { [PRISMA_CONNECT]: { ...fieldsToUpdate } },
-        },
-      };
-    }
+      // Put id field in a where object
+      if (fieldName === 'id' && data) {
+        return {
+          ...acc,
+          where: {
+            id: data,
+          },
+        };
+      }
 
-    // Put id field in a where object
-    if (key === 'id' && data) {
-      return {
-        ...acc,
-        where: {
-          id: data,
-        },
-      };
-    }
+      const type = introspectionResults.types.find(
+        (t) => t.name === resource.type.name,
+      ) as IntrospectionObjectType;
 
-    const type = introspectionResults.types.find(
-      (t) => t.name === resource.type.name,
-    ) as IntrospectionObjectType;
+      // XXX The original author checked if the field is defined in the schema (through introspection),
+      //  but with GraphCMS it's more complicated because localised fields don't appear in the schema and cannot be resolved this way
+      //  We use the same fieldAliasResolver to resolve whether the field is an alias, and if it is then we include it in the mutation
+      let field: IntrospectionField | undefined = type.fields.find((t: IntrospectionField) => t.name === fieldName);
 
-    const isInField = type.fields.find((t) => t.name === key);
+      if (!field) {
+        if (typeof field === 'undefined' && fieldAliasResolver) {
+          // The field wasn't resolved, it's likely an alias, try to resolve alias
+          field = (resource.type as IntrospectionObjectType).fields.find(
+            (field: IntrospectionField) => {
+              return field.name === fieldAliasResolver(field, fieldName, acc, introspectionResults);
+            },
+          );
+        }
+      }
 
-    if (!!isInField) {
-      // Rest should be put in data object
+      if (field) {
+        // Rest should be put in data object
 
-      return {
-        ...acc,
-        data: {
-          ...acc.data,
-          [key]: data,
-        },
-      };
-    }
+        return {
+          ...acc,
+          data: {
+            ...acc.data,
+            [fieldName]: data,
+          },
+        };
+      }
 
-    return acc;
-  },
-  {} as { [key: string]: any },
-);
-
-interface CreateParams {
-  data: { [key: string]: any };
-}
+      return acc;
+    },
+    {} as { [key: string]: any },
+  );
+};
 
 const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
   resource: Resource,
   aorFetchType: string,
   params: CreateParams,
-) =>
-  Object.keys(params.data).reduce(
-    (acc, key) => {
-      let data = params.data[key];
+  fieldAliasResolver?: RAGqlPrismaFieldAliasResolver,
+) => {
+  return Object.keys(params.data).reduce(
+    (acc, fieldName: string) => {
+      let data = params.data[fieldName];
       if (Array.isArray(data)) {
 
         // if key finish with Ids, its an array of relation
-        if (/Ids$/.test(key)) {
+        if (/Ids$/.test(fieldName)) {
           //we remove Ids form field
-          key = key.replace(/Ids$/, '');
+          fieldName = fieldName.replace(/Ids$/, '');
           //and put id in the array
           data = data.map((id: string) => ({ id }));
         }
@@ -340,7 +344,7 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
         const inputType = findInputFieldForType(
           introspectionResults,
           `${resource.type.name}CreateInput`,
-          key,
+          fieldName,
         );
         if (!inputType) {
           return acc;
@@ -360,7 +364,7 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
             ...acc,
             data: {
               ...acc.data,
-              [key]: {
+              [fieldName]: {
                 [PRISMA_SET]: data,
               },
             },
@@ -371,7 +375,7 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
           ...acc,
           data: {
             ...acc.data,
-            [key]: {
+            [fieldName]: {
               [PRISMA_CONNECT]: data,
             },
           },
@@ -383,7 +387,7 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
           inputArg: data,
           introspectionResults,
           typeName: `${resource.type.name}CreateInput`,
-          field: key,
+          field: fieldName,
           mutationType: PRISMA_CONNECT,
         });
         // If no fields in the object are valid, continue
@@ -396,17 +400,17 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
           ...acc,
           data: {
             ...acc.data,
-            [key]: { [PRISMA_CONNECT]: { ...fieldsToConnect } },
+            [fieldName]: { [PRISMA_CONNECT]: { ...fieldsToConnect } },
           },
         };
       }
 
       // Put id field in a where object
-      if (key === 'id' && params.data[key]) {
+      if (fieldName === 'id' && params.data[fieldName]) {
         return {
           ...acc,
           where: {
-            id: params.data[key],
+            id: params.data[fieldName],
           },
         };
       }
@@ -414,15 +418,30 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
       const type = introspectionResults.types.find(
         (t) => t.name === resource.type.name,
       ) as IntrospectionObjectType;
-      const isInField = type.fields.find((t) => t.name === key);
 
-      if (isInField) {
+      // XXX The original author checked if the field is defined in the schema (through introspection),
+      //  but with GraphCMS it's more complicated because localised fields don't appear in the schema and cannot be resolved this way
+      //  We use the same fieldAliasResolver to resolve whether the field is an alias, and if it is then we include it in the mutation
+      let field: IntrospectionField | undefined = type.fields.find((t: IntrospectionField) => t.name === fieldName);
+
+      if (!field) {
+        if (typeof field === 'undefined' && fieldAliasResolver) {
+          // The field wasn't resolved, it's likely an alias, try to resolve alias
+          field = (resource.type as IntrospectionObjectType).fields.find(
+            (field: IntrospectionField) => {
+              return field.name === fieldAliasResolver(field, fieldName, acc, introspectionResults);
+            },
+          );
+        }
+      }
+
+      if (field) {
         // Rest should be put in data object
         return {
           ...acc,
           data: {
             ...acc.data,
-            [key]: data,
+            [fieldName]: data,
           },
         };
       }
@@ -431,55 +450,58 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
     },
     {} as { [key: string]: any },
   );
+};
 
 export default (introspectionResults: IntrospectionResult) => (
   resource: Resource,
   aorFetchType: string,
-  params: any,
+  params: Params,
+  fieldAliasResolver?: RAGqlPrismaFieldAliasResolver,
 ) => {
   switch (aorFetchType) {
     case GET_LIST: {
       return buildGetListVariables(introspectionResults)(
         resource,
         aorFetchType,
-        params,
+        params as GetListParams,
       );
     }
     case GET_MANY:
       return {
-        where: { id_in: params.ids },
+        where: { id_in: (params as GetManyParams).ids },
       };
     case GET_MANY_REFERENCE: {
-      const parts = params.target.split('.');
+      const parts = (params as GetManyReferenceParams).target.split('.');
 
       return {
-        where: { [parts[0]]: { id: params.id } },
+        where: { [parts[0]]: { id: (params as GetOneParams).id } },
       };
     }
     case GET_ONE:
       return {
-        where: { id: params.id },
+        where: { id: (params as GetOneParams).id },
       };
     case UPDATE: {
-      const variables = buildUpdateVariables(introspectionResults)(
+      return buildUpdateVariables(introspectionResults)(
         resource,
         aorFetchType,
-        params,
+        params as UpdateParams,
+        fieldAliasResolver,
       );
-      return variables;
     }
 
     case CREATE: {
       return buildCreateVariables(introspectionResults)(
         resource,
         aorFetchType,
-        params,
+        params as CreateParams,
+        fieldAliasResolver,
       );
     }
 
     case DELETE:
       return {
-        where: { id: params.id },
+        where: { id: (params as DeleteParams).id },
       };
   }
 };

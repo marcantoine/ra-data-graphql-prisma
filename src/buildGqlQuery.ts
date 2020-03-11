@@ -3,7 +3,9 @@ import {
   DocumentNode,
   FieldNode,
   IntrospectionField,
+  IntrospectionNamedTypeRef,
   IntrospectionObjectType,
+  IntrospectionType, ListTypeNode, NamedTypeNode, NonNullTypeNode,
   parse,
   SelectionNode,
   TypeKind,
@@ -27,8 +29,8 @@ export const buildFields = (introspectionResults: IntrospectionResult) => (
   fields: IntrospectionField[],
 ): FieldNode[] => {
   return fields.reduce(
-    (acc: FieldNode[], field) => {
-      const type = getFinalType(field.type);
+    (acc: FieldNode[], field: IntrospectionField) => {
+      const type: IntrospectionNamedTypeRef = getFinalType(field.type);
 
       if (type.name.startsWith('_')) {
         return acc;
@@ -53,7 +55,7 @@ export const buildFields = (introspectionResults: IntrospectionResult) => (
         ];
       }
 
-      const linkedType = introspectionResults.types.find(
+      const linkedType: IntrospectionType | undefined = introspectionResults.types.find(
         (t) => t.name === type.name,
       );
 
@@ -79,7 +81,7 @@ export const buildFields = (introspectionResults: IntrospectionResult) => (
   );
 };
 
-export const getArgType = (arg: IntrospectionField) => {
+export const getArgType = (arg: IntrospectionField): ListTypeNode | NonNullTypeNode | NamedTypeNode => {
   const type = getFinalType(arg.type);
   const required = isRequired(arg.type);
   const list = isList(arg.type);
@@ -192,7 +194,7 @@ export default (introspectionResults: IntrospectionResult) => (
   queryType: Query,
   variables: { [key: string]: any },
   fragment: DocumentNode,
-) => {
+): DocumentNode => {
   const { orderBy, skip, first, ...countVariables } = variables;
   const apolloArgs = buildApolloArgs(queryType, variables);
   const args = buildArgs(queryType, variables);
