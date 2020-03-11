@@ -4,11 +4,13 @@ import buildGqlQuery, { Query } from './buildGqlQuery';
 import buildVariables from './buildVariables';
 import { IntrospectionResult } from './constants/interfaces';
 import getResponseParser from './getResponseParser';
+import { BuildQueryFactorySignature, BuildQueryResult } from './types/BuildQuery';
+import { GqlVariables } from './types/GqlVariables';
 
 export const buildQueryFactory = () => (
   introspectionResults: IntrospectionResult,
   fieldAliasResolver?: Function,
-) => {
+): BuildQueryFactorySignature => {
   const knownResources = introspectionResults.resources.map((r) => r.type.name);
 
   return (
@@ -16,7 +18,7 @@ export const buildQueryFactory = () => (
     resourceName: string,
     params: any,
     fragment: DocumentNode,
-  ) => {
+  ): BuildQueryResult => {
     const resource = introspectionResults.resources.find(
       (r) => r.type.name === resourceName,
     );
@@ -35,12 +37,12 @@ export const buildQueryFactory = () => (
         `No query or mutation matching aor fetch type ${aorFetchType} could be found for resource ${resource.type.name}`,
       );
     }
-    const variables = buildVariables(introspectionResults)(
+    const variables: GqlVariables = buildVariables(introspectionResults)(
       resource,
       aorFetchType,
       params,
     )!;
-    const query = buildGqlQuery(introspectionResults)(
+    const query: DocumentNode = buildGqlQuery(introspectionResults)(
       resource,
       aorFetchType,
       queryType,

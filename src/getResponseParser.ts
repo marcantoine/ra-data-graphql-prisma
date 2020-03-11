@@ -4,7 +4,7 @@ import { IntrospectionResult, Resource } from './constants/interfaces';
 import { ApolloResponse } from './types/ApolloResponse';
 import { ApolloResponseData, MultipleRecordsResponse, SingleRecordResponse } from './types/ApolloResponseData';
 import { GqlRecord } from './types/GqlRecord';
-import { ResponseParserResult } from './types/ResponseParser';
+import { GetResponseParserSignature, ResponseParserResult, ResponseParserSignature } from './types/ResponseParser';
 import getFinalType from './utils/getFinalType';
 
 declare type Sanitize = (record: GqlRecord) => any;
@@ -89,10 +89,10 @@ const sanitizeResource = (
   }, {});
 };
 
-export default (introspectionResults: IntrospectionResult, fieldAliasResolver?: Function) => (
+export default (introspectionResults: IntrospectionResult, fieldAliasResolver?: Function): GetResponseParserSignature => (
   aorFetchType: string,
   resource: Resource,
-) => (response: ApolloResponse): ResponseParserResult => {
+): ResponseParserSignature => (response: ApolloResponse): ResponseParserResult => {
   const sanitize: Sanitize = sanitizeResource(introspectionResults, resource, fieldAliasResolver);
 
   if (

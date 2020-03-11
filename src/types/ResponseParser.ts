@@ -1,3 +1,5 @@
+import { Resource } from '../constants/interfaces';
+import { ApolloResponse } from './ApolloResponse';
 import { GqlRecord } from './GqlRecord';
 
 /**
@@ -11,3 +13,6 @@ export declare type ResponseParserResult = { // Single record
   data: GqlRecord[];
   total: number;
 }
+
+export declare type ResponseParserSignature = (response: ApolloResponse) => ResponseParserResult;
+export declare type GetResponseParserSignature = (aorFetchType: string, resource: Resource) => ResponseParserSignature;

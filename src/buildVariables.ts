@@ -461,12 +461,11 @@ export default (introspectionResults: IntrospectionResult) => (
         where: { id: params.id },
       };
     case UPDATE: {
-      const variables = buildUpdateVariables(introspectionResults)(
+      return buildUpdateVariables(introspectionResults)(
         resource,
         aorFetchType,
         params,
       );
-      return variables;
     }
 
     case CREATE: {

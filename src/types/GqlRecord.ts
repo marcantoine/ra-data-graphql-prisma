@@ -1,5 +1,8 @@
 /**
+ * Graphql server record
  *
+ * Returned by the GraphQL API
+ * Used by react-admin
  */
 export type GqlRecord = {
   id: string;
