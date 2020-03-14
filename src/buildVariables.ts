@@ -5,7 +5,7 @@ import isObject from 'lodash/isObject';
 import { CREATE, DELETE, GET_LIST, GET_MANY, GET_MANY_REFERENCE, GET_ONE, UPDATE } from 'ra-core';
 import { IntrospectionResult, Resource } from './constants/interfaces';
 
-import { PRISMA_CONNECT, PRISMA_DISCONNECT, PRISMA_SET } from './constants/mutations';
+import { PRISMA_CONNECT, PRISMA_DISCONNECT, PRISMA_SET, PRISMA_UPDATE } from './constants/mutations';
 import { CreateParams, DeleteParams, GetListParams, GetManyParams, GetManyReferenceParams, GetOneParams, Params, UpdateParams } from './types/Params';
 import { RAGqlPrismaFieldAliasResolver } from './types/RAGqlPrismaFieldAliasResolver';
 import { computeFieldsToAddRemoveUpdate } from './utils/computeAddRemoveUpdate';
@@ -104,7 +104,7 @@ const findInputFieldForType = (
   introspectionResults: IntrospectionResult,
   typeName: string,
   field: string,
-) => {
+): IntrospectionNamedTypeRef | null => {
   const type = introspectionResults.types.find(
     (t) => t.name === typeName,
   ) as IntrospectionInputObjectType;
@@ -141,18 +141,22 @@ const buildReferenceField = (
     field: string;
     mutationType: string;
   }) => {
-  const inputType = findInputFieldForType(
+  const inputType: IntrospectionNamedTypeRef | null = findInputFieldForType(
     introspectionResults,
     typeName,
     field,
   );
-  const mutationInputType = findInputFieldForType(
+  const mutationInputType: IntrospectionNamedTypeRef | null = findInputFieldForType(
     introspectionResults,
     inputType!.name,
     mutationType,
   );
 
   return Object.keys(inputArg).reduce((acc, key) => {
+    if (!mutationInputType) {
+      console.error(`Couldn't find a GraphQL mutation type of type "${mutationType}" for "${inputType?.name}" input type through introspection. Field "${field}" has been ignored.`);
+      return acc;
+    }
     return ((Object.keys(acc).length === 0) && inputFieldExistsForType(
       introspectionResults,
       mutationInputType!.name,
@@ -171,18 +175,18 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
 ) => {
   return Object.keys(params.data).reduce(
     (acc, fieldName: string) => {
-      let data = params.data[fieldName];
-      let previousData = params.previousData[fieldName];
+      let value: any | any[] = params.data[fieldName];
+      let previousValue: any | any[] = params.previousData[fieldName];
 
-      if (Array.isArray(data)) {
+      if (Array.isArray(value)) {
 
         // if key finish with Ids, its an array of relation
         if (/Ids$/.test(fieldName)) {
-          previousData = params.previousData[fieldName].map((id: string) => ({ id }));
+          previousValue = params.previousData[fieldName].map((id: string) => ({ id }));
           //we remove Ids form field
           fieldName = fieldName.replace(/Ids$/, '');
           //and put id in the array
-          data = data.map((id: string) => ({ id }));
+          value = value.map((id: string) => ({ id }));
         }
 
         const inputType = findInputFieldForType(
@@ -209,7 +213,7 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
             data: {
               ...acc.data,
               [fieldName]: {
-                [PRISMA_SET]: data,
+                [PRISMA_SET]: value,
               },
             },
           };
@@ -220,8 +224,8 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
           fieldsToAdd,
           fieldsToRemove,
         } = computeFieldsToAddRemoveUpdate(
-          previousData,
-          data,
+          previousValue,
+          value,
         );
         return {
           ...acc,
@@ -235,39 +239,57 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
         };
       }
 
-      if (isObject(data) && !isDate(data)) {
+      if (isObject(value) && !isDate(value)) {
 
-        const fieldsToUpdate = buildReferenceField({
-          inputArg: data,
+        const fieldsToConnect = buildReferenceField({
+          inputArg: value,
           introspectionResults,
           typeName: `${resource.type.name}UpdateInput`,
           field: fieldName,
           mutationType: PRISMA_CONNECT,
         });
+        const fieldsToUpdate = buildReferenceField({
+          inputArg: value,
+          introspectionResults,
+          typeName: `${resource.type.name}UpdateInput`,
+          field: fieldName,
+          mutationType: PRISMA_UPDATE,
+        });
 
-        console.log('fieldsToUpdate', fieldsToUpdate);
-
-        // If no fields in the object are valid, continue
-        if (Object.keys(fieldsToUpdate).length === 0) {
-          return acc;
+        // XXX We allow either a connect or an update, if there is a node connection, then it gets the priority over node update
+        //  I don't see how we could have both a connect and an update at the same time (for the same field), it wouldn't make any sense
+        if (Object.keys(fieldsToConnect).length === 0) {
+          if (Object.keys(fieldsToUpdate).length === 0) {
+            // If no fields in the object are valid, continue
+            return acc;
+          } else {
+            // Else, update the nodes
+            return {
+              ...acc,
+              data: {
+                ...acc.data,
+                [fieldName]: { [PRISMA_UPDATE]: { ...fieldsToUpdate } },
+              },
+            };
+          }
+        } else {
+          // Else, connect the nodes
+          return {
+            ...acc,
+            data: {
+              ...acc.data,
+              [fieldName]: { [PRISMA_CONNECT]: { ...fieldsToConnect } },
+            },
+          };
         }
-
-        // Else, connect the nodes
-        return {
-          ...acc,
-          data: {
-            ...acc.data,
-            [fieldName]: { [PRISMA_CONNECT]: { ...fieldsToUpdate } },
-          },
-        };
       }
 
       // Put id field in a where object
-      if (fieldName === 'id' && data) {
+      if (fieldName === 'id' && value) {
         return {
           ...acc,
           where: {
-            id: data,
+            id: value,
           },
         };
       }
@@ -299,7 +321,7 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
           ...acc,
           data: {
             ...acc.data,
-            [fieldName]: data,
+            [fieldName]: value,
           },
         };
       }

@@ -2,6 +2,7 @@ import { TypeKind } from 'graphql';
 import { CREATE, DELETE, GET_LIST, GET_MANY, GET_MANY_REFERENCE, UPDATE } from 'ra-core';
 import { IntrospectionResult, Resource } from './constants/interfaces';
 import getResponseParser from './getResponseParser';
+import { ApolloResponse } from './types/ApolloResponse';
 
 const testListTypes = (type: string) => {
   it('returns the response expected by RA for GET_LIST', () => {
@@ -72,11 +73,11 @@ const testListTypes = (type: string) => {
       ],
       types: [{ name: 'User' }, { name: 'Tag' }],
     };
-    const response = {
+    const response: ApolloResponse = {
       data: {
         items: [
           {
-            _typeName: 'Post',
+            __typename: 'Post',
             id: 'post1',
             title: 'title1',
             author: { id: 'author1', firstName: 'Toto' },
@@ -88,7 +89,7 @@ const testListTypes = (type: string) => {
             embeddedJson: { foo: 'bar' },
           },
           {
-            _typeName: 'Post',
+            __typename: 'Post',
             id: 'post2',
             title: 'title2',
             author: { id: 'author1', firstName: 'Toto' },
@@ -212,10 +213,10 @@ const testSingleTypes = (type: string) => {
       ],
       types: [{ name: 'User' }, { name: 'Tag' }],
     };
-    const response = {
+    const response: ApolloResponse = {
       data: {
         data: {
-          _typeName: 'Post',
+          __typename: 'Post',
           id: 'post1',
           title: 'title1',
           author: { id: 'author1', firstName: 'Toto' },

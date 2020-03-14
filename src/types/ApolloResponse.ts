@@ -4,6 +4,6 @@ import { ApolloResponseData, MultipleRecordsResponse, SingleRecordResponse } fro
 export declare type ApolloResponse<T = SingleRecordResponse | MultipleRecordsResponse> = {
   data: ApolloResponseData<T>;
   error?: ApolloError;
-  loading: boolean;
-  networkStatus: NetworkStatus;
+  loading?: boolean;
+  networkStatus?: NetworkStatus;
 }

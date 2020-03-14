@@ -297,7 +297,7 @@ describe('buildVariables', () => {
   });
 
   describe('UPDATE', () => {
-    it('returns correct variables', () => {
+    describe('returns correct variables', () => {
       const introspectionResult = {
         types: [
           {
@@ -372,6 +372,16 @@ describe('buildVariables', () => {
                   },
                 },
               },
+              {
+                name: 'update',
+                type: {
+                  kind: TypeKind.NON_NULL,
+                  ofType: {
+                    kind: TypeKind.INPUT_OBJECT,
+                    name: 'AuthorUpdateInput',
+                  },
+                },
+              },
             ],
           },
           {
@@ -385,6 +395,16 @@ describe('buildVariables', () => {
                   ofType: {
                     kind: TypeKind.INPUT_OBJECT,
                     name: 'EditorWhereUniqueInput',
+                  },
+                },
+              },
+              {
+                name: 'update',
+                type: {
+                  kind: TypeKind.NON_NULL,
+                  ofType: {
+                    kind: TypeKind.INPUT_OBJECT,
+                    name: 'EditorUpdateInput',
                   },
                 },
               },
@@ -483,6 +503,19 @@ describe('buildVariables', () => {
             ],
           },
           {
+            name: 'AuthorUpdateInput',
+            kind: TypeKind.INPUT_OBJECT,
+            inputFields: [
+              {
+                name: 'name',
+                type: {
+                  kind: TypeKind.SCALAR,
+                  name: 'String',
+                },
+              },
+            ],
+          },
+          {
             name: 'EditorWhereUniqueInput',
             kind: TypeKind.INPUT_OBJECT,
             inputFields: [
@@ -495,6 +528,19 @@ describe('buildVariables', () => {
               },
               {
                 name: 'code',
+                type: {
+                  kind: TypeKind.SCALAR,
+                  name: 'String',
+                },
+              },
+            ],
+          },
+          {
+            name: 'EditorUpdateInput',
+            kind: TypeKind.INPUT_OBJECT,
+            inputFields: [
+              {
+                name: 'label',
                 type: {
                   kind: TypeKind.SCALAR,
                   name: 'String',
@@ -518,49 +564,84 @@ describe('buildVariables', () => {
         ],
       };
 
-      const params = {
-        data: {
-          id: 'postId',
-          tags: [{ id: 'tags1', code: 'tags1code' }, { id: 'tags2', code: 'tags2scode' }],
-          keywords: ['keyword1', 'keyword2'],
-          author: { id: 'author1', name: 'author1name' },
-          editor: { ref: 'editor1code', code: 'editor1name' },
-          relatedPostsIds: ['relatedPost1', 'relatedPost2'],
-          relatedPosts: [{ id: 'relatedPost1', name: 'postName1' }, { id: 'relatedPost2', name: 'postName2' }],
-          title: 'Foo',
-        },
-        previousData: {
-          tags: [{ id: 'tags1' }, { id: 'tags3' }],
-          keywords: ['keyword1'],
-          editor: { ref: 'editor2code', code: 'editor2name' },
-          relatedPosts: [{ id: 'relatedPost1', name: 'postName1' }, { id: 'relatedPost3', name: 'postName3' }],
-          relatedPostsIds: ['relatedPost1', 'relatedPost3'],
-        },
-      };
+      it('when connecting with new nodes (CONNECT)', () => {
+        const params = {
+          data: {
+            id: 'postId',
+            tags: [{ id: 'tags1', code: 'tags1code' }, { id: 'tags2', code: 'tags2scode' }],
+            keywords: ['keyword1', 'keyword2'],
+            author: { id: 'author1', name: 'author1name' },
+            editor: { ref: 'editor1code', code: 'editor1name' },
+            relatedPostsIds: ['relatedPost1', 'relatedPost2'],
+            relatedPosts: [{ id: 'relatedPost1', name: 'postName1' }, { id: 'relatedPost2', name: 'postName2' }],
+            title: 'Foo',
+          },
+          previousData: {
+            tags: [{ id: 'tags1' }, { id: 'tags3' }],
+            keywords: ['keyword1'],
+            editor: { ref: 'editor2code', code: 'editor2name' },
+            relatedPosts: [{ id: 'relatedPost1', name: 'postName1' }, { id: 'relatedPost3', name: 'postName3' }],
+            relatedPostsIds: ['relatedPost1', 'relatedPost3'],
+          },
+        };
 
-      expect(
-        // @ts-ignore
-        buildVariables(introspectionResult as IntrospectionResult)(
-          { type: { name: 'Post' } } as Resource,
-          UPDATE,
-          params,
-        ),
-      ).toEqual({
-        where: { id: 'postId' },
-        data: {
-          author: { connect: { id: 'author1' } },
-          editor: { connect: { ref: 'editor1code' } },
-          tags: {
-            connect: [{ id: 'tags2' }],
-            disconnect: [{ id: 'tags3' }],
+        expect(
+          // @ts-ignore
+          buildVariables(introspectionResult as IntrospectionResult)(
+            { type: { name: 'Post' } } as Resource,
+            UPDATE,
+            params,
+          ),
+        ).toEqual({
+          where: { id: 'postId' },
+          data: {
+            author: { connect: { id: 'author1' } },
+            editor: { connect: { ref: 'editor1code' } },
+            tags: {
+              connect: [{ id: 'tags2' }],
+              disconnect: [{ id: 'tags3' }],
+            },
+            keywords: { set: ['keyword1', 'keyword2'] },
+            relatedPosts: {
+              connect: [{ id: 'relatedPost2' }],
+              disconnect: [{ id: 'relatedPost3' }],
+            },
+            title: 'Foo',
           },
-          keywords: { set: ['keyword1', 'keyword2'] },
-          relatedPosts: {
-            connect: [{ id: 'relatedPost2' }],
-            disconnect: [{ id: 'relatedPost3' }],
+        });
+      });
+
+      it('when updating existing node (UPDATE)', () => {
+        const params = {
+          data: {
+            id: 'postId',
+            author: { name: 'author1name-updated' },
+            editor: { label: 'editor1label-updated' },
           },
-          title: 'Foo',
-        },
+          previousData: {
+            author: { id: 'author1', name: 'author1name' },
+            tags: [{ id: 'tags1' }, { id: 'tags3' }],
+            keywords: ['keyword1'],
+            editor: { ref: 'editor2code', code: 'editor2name' },
+            relatedPosts: [{ id: 'relatedPost1', name: 'postName1' }, { id: 'relatedPost3', name: 'postName3' }],
+            relatedPostsIds: ['relatedPost1', 'relatedPost3'],
+          },
+        };
+
+        expect(
+          // @ts-ignore
+          buildVariables(introspectionResult as IntrospectionResult)(
+            { type: { name: 'Post' } } as Resource,
+            UPDATE,
+            params,
+          ),
+        ).toEqual({
+          where: { id: 'postId' },
+          data: {
+            author: { update: { name: 'author1name-updated' } },
+            editor: { update: { label: 'editor1label-updated' } },
+          },
+        });
       });
     });
   });

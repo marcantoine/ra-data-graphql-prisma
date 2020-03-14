@@ -9,7 +9,7 @@ export declare type MultipleRecordsResponse = {
   total: {
     aggregate: {
       count: number;
-      __typename: string;
+      __typename?: string;
     };
   };
 };
