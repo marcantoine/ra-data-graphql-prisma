@@ -2,7 +2,10 @@ Changelog
 ===
 
 
-- v1.0.0 - 2020-03-10
+- v1.0.0-beta5 - 2020-03-14
+    - Add support for node UPDATE, now properly build variables when updating a record, even if this record updates nodes from relationships
+        Ex: Assuming a Customer has a Theme, and a Theme has a primaryColor property, it is now possible to update the primaryColor when updating a customer (in the same mutation, through node update)
+- v1.0.0-beta3 - 2020-03-10 (beta, WIP)
     - Released under `@unly/ra-data-graphql-prisma`
     - Add support for GraphCMS localised fields through `fieldAliasResolver` option
 - pre v1

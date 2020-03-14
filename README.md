@@ -21,6 +21,7 @@ A bit of history...
 - https://www.npmjs.com/search?q=ra-data-prisma lists 11 packages, there are no 1.0.0 version, everything is 0.x
 - All packages are at least 180kB, some even go up to 500+... **This one is around 90kB**
 - It's used by https://github.com/UnlyEd/next-right-now-admin, which features a real GraphCMS demo
+- See [CHANGELOG](CHANGELOG.md) for details, features, etc.
 
 ## Demo
 If you wanna give it a try, here's a quick preview on codesandbox.
