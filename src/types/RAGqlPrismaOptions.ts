@@ -17,4 +17,5 @@ export declare type RAGqlPrismaOptions = {
   client?: ApolloClient<any>;
   clientOptions?: ApolloClientOptions<any>;
   debug?: boolean;
+  handleError?: (e: Error, origin: string) => any;
 }
