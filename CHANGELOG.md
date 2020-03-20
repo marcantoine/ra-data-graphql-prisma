@@ -2,6 +2,11 @@ Changelog
 ===
 
 
+- v1.0.0-beta7 - 2020-03-20
+    - [Feature] Handle nested relationship updates
+        i.e: `{"theme":{"logo":{"id":"ck809zcgm1jn10b20cci7c61i"}}}`, now generates: 
+        `{"theme":{"update":{"logo":"connect":{"id":"ck7xehejau7pq0b20cp7x0trw"}}}}`, instead of: 
+        `{"theme":{"update":{"logo":{"id":"ck7xehejau7pq0b20cp7x0trw"}}}`
 - v1.0.0-beta6 - 2020-03-18
     - [Feature] Add `handleError` option for custom error handling
 - v1.0.0-beta5 - 2020-03-14
