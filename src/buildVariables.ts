@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { IntrospectionField, IntrospectionInputObjectType, IntrospectionNamedTypeRef, IntrospectionObjectType } from 'graphql';
+import get from 'lodash/get';
 import isDate from 'lodash/isDate';
 import isObject from 'lodash/isObject';
 import { CREATE, DELETE, GET_LIST, GET_MANY, GET_MANY_REFERENCE, GET_ONE, UPDATE } from 'ra-core';
@@ -241,14 +242,14 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
 
       if (isObject(value) && !isDate(value)) {
 
-        const fieldsToConnect = buildReferenceField({
+        const fieldsToConnect: { [key: string]: any } = buildReferenceField({
           inputArg: value,
           introspectionResults,
           typeName: `${resource.type.name}UpdateInput`,
           field: fieldName,
           mutationType: PRISMA_CONNECT,
         });
-        const fieldsToUpdate = buildReferenceField({
+        let fieldsToUpdate: { [key: string]: any } = buildReferenceField({
           inputArg: value,
           introspectionResults,
           typeName: `${resource.type.name}UpdateInput`,
@@ -264,6 +265,39 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
             return acc;
           } else {
             // Else, update the nodes
+
+            // XXX Handle nested relationship updates
+            //  i.e: {"theme":{"logo":{"id":"ck809zcgm1jn10b20cci7c61i"}}} (where fieldName = 'theme')
+            //  returns: {"theme":{"update":{"logo":"connect":{"id":"ck7xehejau7pq0b20cp7x0trw"}}}}
+
+            // TODO Only handles one level of nested updates, could use recursivity to handle deep nested relationship updates
+            //  but I don't have any test case to implement it so I didn't
+            fieldsToUpdate = Object.keys(fieldsToUpdate).reduce(
+              (subAcc, subFieldName: string) => {
+                const subValue: any = fieldsToUpdate[subFieldName];
+
+                if (isObject(subValue) && !isDate(subValue)) {
+                  // We only consider the "id" field for deep-nested relationship updates, because that's our use-case
+                  const nestedId: string | undefined = get(subValue, 'id');
+
+                  if (typeof nestedId === 'string') {
+                    // XXX Handling a nested relationship field update. Must use connect on the updated id
+                    return {
+                      ...subAcc,
+                      [subFieldName]: { [PRISMA_CONNECT]: { id: nestedId } },
+                    };
+                  }
+                }
+
+                // Not a nested relationship, don't transform
+                return {
+                  ...subAcc,
+                  [subFieldName]: subValue,
+                };
+              },
+              {} as { [key: string]: any },
+            );
+
             return {
               ...acc,
               data: {
