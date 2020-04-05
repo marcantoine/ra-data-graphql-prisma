@@ -7,11 +7,50 @@
 
 # @unly/ra-data-graphql-prisma
 
-`react-admin` data provider for Prisma (v1), used by https://github.com/UnlyEd/next-right-now-admin
+`react-admin` data provider for Prisma (v1), used by [https://github.com/UnlyEd/next-right-now-admin](https://github.com/UnlyEd/next-right-now-admin)
+
+> # Status: STABLE - NON-MAINTAINED
+>
+> This package has been released under **v1.0.0 version and is considered stable**.
+>
+> Note that we do **not** intend on maintaining it. Issues are open for questions but **do not expect bug fixes**. 
+>
+> As of April 2020, this package is **probably the most advanced** of all forks created from [https://github.com/Weakky/ra-data-opencrud](https://github.com/Weakky/ra-data-opencrud/network/members) and can be used to build your own fork.
+
+## Overview of changes
+
+See [CHANGELOG](./CHANGELOG.md)
+
+> Basically, this package has improved TS support, fixed Jest tests and added more features for nested relationships, image upload, and more, compared to it's [upstream origin](https://github.com/marcantoine/ra-data-graphql-prisma).
+>
+> Also, it's used in a **live demo** and allows you to **get started quickly with react-admin**.
+
+## Live demo
+
+- Admin site using `@unly/ra-data-graphql-prisma@1.0.0`: [Live demo](https://nrn-admin.unly.now.sh/) - [Source code](https://github.com/UnlyEd/next-right-now-admin)
+- Online demo (managed by the above admin site):
+    - [https://nrn-v1-ssr-mst-aptd-gcms-lcz-sty-c1.now.sh/](https://nrn-v1-ssr-mst-aptd-gcms-lcz-sty-c1.now.sh/)
+    - [https://nrn-v1-ssr-mst-aptd-gcms-lcz-sty-c2.now.sh/](https://nrn-v1-ssr-mst-aptd-gcms-lcz-sty-c2.now.sh/)
 
 ## Why again another fork?
 
-A bit of history...
+### Our motivations
+
+We wanted to build our own admin backoffice to manage our content. But the task has revealed itself much more complicated than what I thought it'd be.
+
+- React-admin is much harder to use than what I hoped for:
+    - It lacks TS support and extensive documentation, cost of learning is very high
+    - Official examples are often outdated
+    - Finding community help wasn't as easy as expected, despite a 12K+ stars counter
+    - In short, the cost of "getting started" is much, much higher than expected and broke our confidence in our ability to deliver a product of quality on time
+- The "react-admin <> GraphQL" data provider [I had found](https://github.com/Weakky/ra-data-opencrud) when building my initial POC isn't maintained and not advanced enough for our use cases
+- We had to spend quite some time finding a proper alternative ([fork](https://github.com/marcantoine/ra-data-graphql-prisma)), but despite being used in production it was still not advanced enough and was lacking a lot of good practices (huge npm package, outdated TS, broken tests, etc.)
+- We learned that the GraphCMS API we're using would change it's API in a breaking way, which would force us to update this package again in the future
+- At this point we believe there was too many issues with the whole things, and too many chances that something would go wrong and would stop us from growing (ROI)
+- Thus, we decided to find another alternative and released this package under a stable and documented version, for other people to have a better experience than we did.
+    - For the record, we've found other potential alternatives, such as [Directus](https://directus.io/) and [Frappe](https://frappe.io/docs) which I recommend to take a look at.
+
+### A bit of history...
 
 - https://github.com/Weakky/ra-data-opencrud was created in 2018, but hasn't been updated since Oct. 2018
 - https://github.com/marcantoine/ra-data-graphql-prisma took over from `ra-data-opencrud` and is still maintained, it's also used in a production app (private)
@@ -22,13 +61,6 @@ A bit of history...
 - All packages are at least 180kB, some even go up to 500+... **This one is around 90kB**
 - It's used by https://github.com/UnlyEd/next-right-now-admin, which features a real GraphCMS demo
 - See [CHANGELOG](CHANGELOG.md) for details, features, etc.
-
-## Demo
-If you wanna give it a try, here's a quick preview on codesandbox.
-The API is hosted on Prisma's public servers, which means the API is limited to 10 API calls per seconds.
-Be aware that it might not be working because of that, or that performances may be poor.
-
-[![Edit ra-data-prisma](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/Weakky/ra-data-prisma/tree/master/examples/prisma-ecommerce)
 
 ---
 
