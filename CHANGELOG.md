@@ -2,6 +2,8 @@ Changelog
 ===
 
 
+- v1.0.0 - 2020-04-05
+    - [Release] Released previous feature as stable version - Used by https://github.com/UnlyEd/next-right-now-admin
 - v1.0.0-beta7 - 2020-03-20
     - [Feature] Handle nested relationship updates
         i.e: `{"theme":{"logo":{"id":"ck809zcgm1jn10b20cci7c61i"}}}`, now generates: 
