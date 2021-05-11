@@ -351,6 +351,12 @@ const buildUpdateVariables = (introspectionResults: IntrospectionResult) => (
       if (field) {
         // Rest should be put in data object
 
+        // ra recently added a fix on `DateInput` which send an empty string as default value instead of a null which makes update and edit mutations crash.
+        // this line should fix the issue for DateTime Scalar. We basically force a null value when there is an non desired `""`
+        if ((field.type as IntrospectionNamedTypeRef).name === 'DateTime') {
+          value = value === "" ? null : value
+        }
+
         return {
           ...acc,
           data: {
@@ -493,6 +499,13 @@ const buildCreateVariables = (introspectionResults: IntrospectionResult) => (
 
       if (field) {
         // Rest should be put in data object
+
+        // ra recently added a fix on `DateInput` which send an empty string as default value instead of a null which makes update and edit mutations crash.
+        // this line should fix the issue for DateTime Scalar. We basically force a null value when there is an non desired `""`
+        if ((field.type as IntrospectionNamedTypeRef).name === 'DateTime') {
+          data = data === "" ? null : data
+        }
+
         return {
           ...acc,
           data: {
