@@ -1,0 +1,14 @@
+{
+  "schemaPath": "schema.graphql",
+  "extensions": {
+    "endpoints": {
+      "master": {
+        "url": "https://eu1.prisma.sh/flavian/ra-data-prisma/dev",
+        "introspect": true,
+        "headers": {
+          "user-agent": "JS GraphQL"
+        }
+      }
+    }
+  }
+}

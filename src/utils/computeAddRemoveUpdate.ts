@@ -5,23 +5,23 @@ type ID = string;
 const formatId = (id: ID) => ({ id });
 
 export const computeFieldsToAdd = (oldIds: [], newIds: []) => {
-  let idsNew = newIds.map((v: { id: string }) => v.id);
-  let idsOld = oldIds.map((v: { id: string }) => v.id);
+  const idsNew = newIds.map((v: { id: string }) => v.id);
+  const idsOld = oldIds.map((v: { id: string }) => v.id);
   return difference(idsNew, idsOld).map(formatId);
 };
 
 export const computeFieldsToRemove = (oldIds: [], newIds: []) => {
-  let idsNew = newIds.map((v: { id: string }) => v.id);
-  let idsOld = oldIds.map((v: { id: string }) => v.id);
+  const idsNew = newIds.map((v: { id: string }) => v.id);
+  const idsOld = oldIds.map((v: { id: string }) => v.id);
   return difference(idsOld, idsNew).map(formatId);
 };
 
 export const computeFieldsToUpdate = (oldIds: ID[], newIds: ID[]) => {
-  return oldIds.filter(oldId => newIds.includes(oldId)).map(formatId);
+  return oldIds.filter((oldId) => newIds.includes(oldId)).map(formatId);
 };
 
 export const computeFieldsToAddRemoveUpdate = (oldIds: [], newIds: []) => ({
   fieldsToAdd: computeFieldsToAdd(oldIds, newIds),
   fieldsToRemove: computeFieldsToRemove(oldIds, newIds),
-  fieldsToUpdate: computeFieldsToUpdate(oldIds, newIds)
+  fieldsToUpdate: computeFieldsToUpdate(oldIds, newIds),
 });

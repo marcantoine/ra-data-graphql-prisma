@@ -1,80 +1,115 @@
-import { TypeKind, IntrospectionObjectType } from 'graphql';
-import { GET_LIST, GET_MANY, GET_MANY_REFERENCE } from 'react-admin';
-import getFinalType from './utils/getFinalType';
+import { IntrospectionField, IntrospectionObjectType, TypeKind } from 'graphql';
+import { GET_LIST, GET_MANY, GET_MANY_REFERENCE } from 'ra-core';
 import { IntrospectionResult, Resource } from './constants/interfaces';
+import { ApolloResponse } from './types/ApolloResponse';
+import { ApolloResponseData, MultipleRecordsResponse, SingleRecordResponse } from './types/ApolloResponseData';
+import { GqlRecord } from './types/GqlRecord';
+import { RAGqlPrismaFieldAliasResolver } from './types/RAGqlPrismaFieldAliasResolver';
+import { GetResponseParserSignature, ResponseParserResult, ResponseParserSignature } from './types/ResponseParser';
+import getFinalType from './utils/getFinalType';
+
+declare type Sanitize = (record: GqlRecord) => any;
 
 const sanitizeResource = (
   introspectionResults: IntrospectionResult,
-  resource: Resource
-) => (data: { [key: string]: any }): any => {
-  return Object.keys(data).reduce((acc, key) => {
-    if (key.startsWith('_')) {
+  resource: Resource,
+  fieldAliasResolver?: RAGqlPrismaFieldAliasResolver,
+) => (record: GqlRecord): any => {
+  return Object.keys(record).reduce((acc, fieldName: string) => {
+    if (fieldName.startsWith('_')) {
       return acc;
     }
 
-    const field = (resource.type as IntrospectionObjectType).fields.find(
-      f => f.name === key
-    )!;
+    let field: IntrospectionField | undefined = (resource.type as IntrospectionObjectType).fields.find(
+      (field) => {
+        return field.name === fieldName; // Aliased fields won't be found through such simple comparison (ie: myTitle: title)
+      },
+    );
+    if (typeof field === 'undefined' && fieldAliasResolver) {
+      // The field wasn't resolved, it's likely an alias, try to resolve alias
+      const fieldAlias: IntrospectionField | undefined = (resource.type as IntrospectionObjectType).fields.find(
+        (field: IntrospectionField) => {
+          return field.name === fieldAliasResolver(field, fieldName, acc, introspectionResults);
+        },
+      );
+
+      // If alias is found, copy alias property but keep the actual field name
+      if (fieldAlias) {
+        field = {
+          ...fieldAlias,
+          name: fieldName,
+        };
+      }
+    }
+    if (typeof field === 'undefined') {
+      // The field wasn't resolved still, ignore it
+      // eslint-disable-next-line no-console
+      console.error(`Field "${fieldName}" couldn't be resolved from introspection using resource "${resource.type.name}":`, resource);
+      return acc;
+    }
     const type = getFinalType(field.type);
 
     if (type.kind !== TypeKind.OBJECT) {
-      return { ...acc, [field.name]: data[field.name] };
+      return { ...acc, [field.name]: record[field.name] };
     }
 
     // FIXME: We might have to handle linked types which are not resources but will have to be careful about endless circular dependencies
     const linkedResource = introspectionResults.resources.find(
-      r => r.type.name === type.name
+      (r) => r.type.name === type.name,
     );
 
     if (linkedResource) {
-      const linkedResourceData = data[field.name];
+      const linkedResourceData = record[field.name];
 
       if (Array.isArray(linkedResourceData)) {
         return {
           ...acc,
-          [field.name]: data[field.name].map(
-            sanitizeResource(introspectionResults, linkedResource)
+          [field.name]: record[field.name].map(
+            sanitizeResource(introspectionResults, linkedResource),
           ),
-          [`${field.name}Ids`]: data[field.name].map(
-            (d: { id: string }) => d.id
-          )
+          [`${field.name}Ids`]: record[field.name].map(
+            (d: { id: string }) => d.id,
+          ),
         };
       }
 
       return {
         ...acc,
         [`${field.name}.id`]: linkedResourceData
-          ? data[field.name].id
+          ? record[field.name].id
           : undefined,
         [field.name]: linkedResourceData
           ? sanitizeResource(introspectionResults, linkedResource)(
-            data[field.name]
+            record[field.name],
           )
-          : undefined
+          : undefined,
       };
     }
 
-    return { ...acc, [field.name]: data[field.name] };
+    return { ...acc, [field.name]: record[field.name] };
   }, {});
 };
 
-export default (introspectionResults: IntrospectionResult) => (
+export default (introspectionResults: IntrospectionResult, fieldAliasResolver?: RAGqlPrismaFieldAliasResolver): GetResponseParserSignature => (
   aorFetchType: string,
-  resource: Resource
-) => (response: { [key: string]: any }) => {
-  const sanitize = sanitizeResource(introspectionResults, resource);
-  const data = response.data;
+  resource: Resource,
+): ResponseParserSignature => (response: ApolloResponse): ResponseParserResult => {
+  const sanitize: Sanitize = sanitizeResource(introspectionResults, resource, fieldAliasResolver);
 
   if (
     aorFetchType === GET_LIST ||
     aorFetchType === GET_MANY ||
     aorFetchType === GET_MANY_REFERENCE
   ) {
-    return {
-      data: response.data.items.map(sanitize),
-      total: response.data.total.aggregate.count
-    };
-  }
+    const data: ApolloResponseData<MultipleRecordsResponse> = response.data as MultipleRecordsResponse;
 
-  return { data: sanitize(data.data) };
+    return {
+      data: data.items.map(sanitize),
+      total: data.total.aggregate.count,
+    };
+  } else {
+    const data: ApolloResponseData<SingleRecordResponse> = response.data as SingleRecordResponse;
+
+    return { data: sanitize(data.data) };
+  }
 };

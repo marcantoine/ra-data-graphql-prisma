@@ -2,6 +2,7 @@ import { IntrospectionSchema, IntrospectionType } from 'graphql';
 
 export interface Resource {
   type: IntrospectionType;
+
   [key: string]: any;
 }
 
