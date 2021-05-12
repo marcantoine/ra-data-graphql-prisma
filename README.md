@@ -1,6 +1,8 @@
 
 # @marcantoine/ra-data-graphql-prisma
 
+[![NPM](https://nodei.co/npm/ra-data-graphql-prisma.png?mini=true)](https://npmjs.org/package/ra-data-graphql-prisma)
+
 `react-admin` data provider for Prisma (v1)
 
 The package is a fork from [https://github.com/Weakky/ra-data-opencrud](https://github.com/Weakky/ra-data-opencrud) which includes some non-supported features.
