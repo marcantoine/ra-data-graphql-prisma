@@ -1,15 +1,19 @@
-<a href="https://unly.org"><img src="https://storage.googleapis.com/unly/images/ICON_UNLY.png" align="right" height="20" alt="Unly logo" title="Unly logo" /></a>
-[![Version][github-version-image]][github-version-url]
-[![Liscence][github-liscence-image]][github-liscence-url][![Releases][github-all-release-image]][github-all-release-url][![NPM Downloads][npm-downloads-image]][npm-downloads-url]
-[![Maintainability](https://api.codeclimate.com/v1/badges/f86e68cb7b3976d0e2ab/maintainability)](https://codeclimate.com/github/UnlyEd/ra-data-graphql-prisma/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/f86e68cb7b3976d0e2ab/test_coverage)](https://codeclimate.com/github/UnlyEd/ra-data-graphql-prisma/test_coverage)
-[![Build Status](https://travis-ci.com/UnlyEd/ra-data-graphql-prisma.svg?branch=master)](https://travis-ci.com/UnlyEd/ra-data-graphql-prisma)
 
-# @unly/ra-data-graphql-prisma
+# @marcantoine/ra-data-graphql-prisma
 
-`react-admin` data provider for Prisma (v1), used by [https://github.com/UnlyEd/next-right-now-admin](https://github.com/UnlyEd/next-right-now-admin)
+`react-admin` data provider for Prisma (v1)
 
-> # Status: STABLE - NON-MAINTAINED
+The package is a fork from [https://github.com/Weakky/ra-data-opencrud](https://github.com/Weakky/ra-data-opencrud) which includes some non-supported features.
+
+It has then been improved and stabilized by a downstream fork  [https://github.com/unly/ra-data-opencrud](https://github.com/UnlyEd/ra-data-graphql-prisma)
+
+The only difference to date between this fork and the downstrem fork is a fix on Date: An empty date is not supported by Prisma v1. This package transform now a `""` date to null. This has been made necessary by an update to Material-UI and react-admin.
+
+This package is currently used in production on a private react-admin app.
+
+## Legacy readme from downstream:
+
+> ## Status: STABLE - NON-MAINTAINED
 >
 > This package has been released under **v1.0.0 version and is considered stable**.
 >
